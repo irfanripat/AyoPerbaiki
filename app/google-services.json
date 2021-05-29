@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "447143715504",
+    "firebase_url": "https://ayoperbaiki-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "ayoperbaiki",
+    "storage_bucket": "ayoperbaiki.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:447143715504:android:a8ff8e3ae437d065425175",
+        "android_client_info": {
+          "package_name": "com.capstone.ayoperbaiki"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "447143715504-1lhermuac2pp9empv6p4ulur78fh0n43.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.capstone.ayoperbaiki",
+            "certificate_hash": "c16bbc0f096cdb3462666cb6a21045bc057d0ce4"
+          }
+        },
+        {
+          "client_id": "447143715504-af7afpe3hbhvfu8nu27ojmvho0ncl703.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAbzqUzd2etKsUdqTZR3yoB0QooOg0vnl4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "447143715504-af7afpe3hbhvfu8nu27ojmvho0ncl703.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
