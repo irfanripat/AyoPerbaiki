@@ -34,6 +34,16 @@
         app:backgroundTint="@color/ss_bottom"
         android:layout_gravity="bottom|end"
         tools:ignore="ContentDescription" />
+    
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include
+            layout="@layout/bottom_sheet_detail_disaster"/>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

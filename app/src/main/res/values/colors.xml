@@ -12,4 +12,7 @@
     <color name="ss_top">#193E5A</color>
 
     <color name="font_header">#1C163D</color>
+    <color name="font_gray">#9C9C9C</color>
+    <color name="bg_gray">#ECECEC</color>
+    <color name="btn_donasi">#6D7A93</color>
 </resources>
