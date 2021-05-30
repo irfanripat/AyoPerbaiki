@@ -3,6 +3,7 @@ package com.capstone.ayoperbaiki.core.domain.repository
 
 import android.net.Uri
 import com.capstone.ayoperbaiki.core.data.Resource
+import com.capstone.ayoperbaiki.core.data.source.firebase.response.ReportResponse
 import com.capstone.ayoperbaiki.core.domain.model.Report
 import kotlinx.coroutines.flow.Flow
 

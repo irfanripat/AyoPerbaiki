@@ -3,6 +3,7 @@ package com.capstone.ayoperbaiki.core.data.source.firebase
 
 import android.net.Uri
 import com.capstone.ayoperbaiki.core.data.Resource
+import com.capstone.ayoperbaiki.core.data.source.firebase.response.ReportResponse
 import com.capstone.ayoperbaiki.core.domain.model.Report
 import com.capstone.ayoperbaiki.core.utils.Constants.REF_NAME
 import com.google.firebase.firestore.CollectionReference
@@ -19,7 +20,7 @@ class FirebaseDataSource @Inject constructor(
     private val storage: StorageReference
 ) {
 
-    suspend fun getAllReport() : Resource<List<Report>> =
+    suspend fun getAllReport() : Resource<List<ReportResponse>> =
         suspendCoroutine { cont ->
             dbCollection
                 .get()
