@@ -38,6 +38,7 @@ class MainActivity : AppCompatActivity() {
     private fun initBinding() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
     }
 
     private fun initBottomSheet() {
