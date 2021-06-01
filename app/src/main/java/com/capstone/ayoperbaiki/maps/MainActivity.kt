@@ -3,7 +3,6 @@ package com.capstone.ayoperbaiki.maps
 import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -15,9 +14,9 @@ import com.capstone.ayoperbaiki.core.data.Resource
 import com.capstone.ayoperbaiki.core.domain.model.Report
 import com.capstone.ayoperbaiki.databinding.ActivityMainBinding
 import com.capstone.ayoperbaiki.utils.Disaster.mapDisasterIcon
+import com.capstone.ayoperbaiki.utils.Utils.hide
+import com.capstone.ayoperbaiki.utils.Utils.show
 import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -30,7 +29,6 @@ import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.random.Random
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -105,27 +103,31 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun hideLoadingIndicator() {
-        //hide loading indicator while process is finish
+        binding.cvProgress.root.hide()
     }
 
     private fun showLoadingIndicator() {
-        //display loading indicator while data is on progress to load
+        binding.cvProgress.root.show()
     }
 
     private fun showErrorMessage() {
-        //display some text to user to tell them that data was failed to load
+        Toast.makeText(this, "Gagal mengambil data, pastikan koneksi internet anda tidak bermasalah", Toast.LENGTH_SHORT).show()
     }
 
     private fun displayDisasterOnMap(data: List<Report>) {
         mapFragment.getMapAsync {googleMap ->
             googleMap.apply {
-                data.map { report ->
-                    addMarker(
-                            MarkerOptions()
-                                    .position(LatLng(report.address.latitude, report.address.longitude))
-                                    .title(report.disaster.disasterName)
-                                    .icon(BitmapDescriptorFactory.fromResource(mapDisasterIcon.getValue(report.disaster.id)))
-                    )
+                if (data.isNullOrEmpty()) {
+                    showErrorMessage()
+                } else {
+                    data.map { report ->
+                        addMarker(
+                                MarkerOptions()
+                                        .position(LatLng(report.address.latitude, report.address.longitude))
+                                        .title(report.disaster.disasterName)
+                                        .icon(BitmapDescriptorFactory.fromResource(mapDisasterIcon.getValue(report.disaster.id)))
+                        )
+                    }
                 }
 
                 setOnMarkerClickListener {

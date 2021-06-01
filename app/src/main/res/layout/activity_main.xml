@@ -45,5 +45,12 @@
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
+    <include
+        android:id="@+id/cv_progress"
+        layout="@layout/cv_progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"/>
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
