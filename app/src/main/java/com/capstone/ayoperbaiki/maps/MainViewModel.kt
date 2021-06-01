@@ -30,11 +30,4 @@ class MainViewModel @Inject constructor(private val reportUseCase: ReportUseCase
         }
     }
 
-    fun generateDummyReport() {
-        viewModelScope.launch {
-            for (i in 1..10)
-                reportUseCase.submitReport(dummyData)
-        }
-    }
-
 }
