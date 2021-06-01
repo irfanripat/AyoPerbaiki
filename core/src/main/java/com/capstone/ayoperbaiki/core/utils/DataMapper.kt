@@ -1,6 +1,8 @@
 package com.capstone.ayoperbaiki.core.utils
 
 import com.capstone.ayoperbaiki.core.data.source.firebase.response.ReportResponse
+import com.capstone.ayoperbaiki.core.domain.model.Address
+import com.capstone.ayoperbaiki.core.domain.model.Disaster
 import com.capstone.ayoperbaiki.core.domain.model.Feedback
 import com.capstone.ayoperbaiki.core.domain.model.Report
 
@@ -11,9 +13,8 @@ object DataMapper {
         input.map {
             val report = Report(
                 id = it.id,
-                disaster = it.disaster,
-                latitude = it.latitude,
-                longitude = it.longitude,
+                disaster = Disaster(it.disaster.id, it.disaster.disasterName),
+                address = Address(it.address.address, it.address.city, it.address.state, it.address.country, it.address.postalCode, it.address.knownName, it.address.latitude, it.address.longitude),
                 timeStamp = it.timeStamp,
                 description = it.description,
                 feedback = Feedback(it.feedback.status, it.feedback.description),
