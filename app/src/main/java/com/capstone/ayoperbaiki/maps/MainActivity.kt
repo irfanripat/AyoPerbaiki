@@ -20,6 +20,7 @@ import com.capstone.ayoperbaiki.core.domain.model.Report
 import com.capstone.ayoperbaiki.databinding.ActivityMainBinding
 import com.capstone.ayoperbaiki.form.DisasterReportFormActivity
 import com.capstone.ayoperbaiki.utils.Disaster.mapDisasterIcon
+import com.capstone.ayoperbaiki.utils.Utils.EXTRA_ADDRESS
 import com.capstone.ayoperbaiki.utils.Utils.STARTING_COORDINATE
 import com.capstone.ayoperbaiki.utils.Utils.hide
 import com.capstone.ayoperbaiki.utils.Utils.show
@@ -58,7 +59,7 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
         initBottomSheet()
         binding.btnAdd.setOnClickListener {
             startActivity(Intent(this, DisasterReportFormActivity::class.java))
-//            addNewReport(add)
+            addNewReport(Address("Padang-Padang", "Luwu", "Sulawesi Selatan", "Indonesia", "91994", "Padang-Padang", 1.34, 2.123))
         }
         observeAllReport()
         observeSelectedLatLang()
@@ -219,7 +220,9 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
     }
 
     private fun addNewReport(address: Address) {
-        //intent ke detail
+        val intent = Intent(this, DisasterReportFormActivity::class.java)
+        intent.putExtra(EXTRA_ADDRESS, address)
+        startActivity(intent)
     }
 
     private fun getAddressFromLocation(latLng: LatLng) {
