@@ -10,11 +10,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.capstone.ayoperbaiki.R
 import com.capstone.ayoperbaiki.core.data.Resource
-import com.capstone.ayoperbaiki.core.data.source.firebase.response.AddressResponse
 import com.capstone.ayoperbaiki.core.domain.model.Address
 import com.capstone.ayoperbaiki.core.domain.model.Report
 import com.capstone.ayoperbaiki.databinding.ActivityMainBinding
@@ -33,10 +31,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPS
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
 import com.google.firebase.Timestamp
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import java.io.IOException
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
@@ -51,18 +46,18 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
     private lateinit var mapFragment: SupportMapFragment
     private var selectedMarker: Marker? = null
+    private var selectedAddress: Address? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initBinding()
         initMapFragment()
         initBottomSheet()
-        binding.btnAdd.setOnClickListener {
-            startActivity(Intent(this, DisasterReportFormActivity::class.java))
-            addNewReport(Address("Padang-Padang", "Luwu", "Sulawesi Selatan", "Indonesia", "91994", "Padang-Padang", 1.34, 2.123))
-        }
         observeAllReport()
         observeSelectedLatLang()
+        binding.btnAdd.setOnClickListener {
+            addNewReport(selectedAddress!!)
+        }
     }
 
     private fun initMapFragment() {
@@ -121,16 +116,13 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
 
     private fun observeSelectedLatLang() {
         viewModel.selectedLatLng.observe(this, { coordinate ->
-            if (coordinate != null) {
-                binding.btnAdd.show()
-                mapFragment.getMapAsync { googleMap ->
+            mapFragment.getMapAsync { googleMap ->
+                if (coordinate != null) {
                     googleMap.apply {
-                        selectedMarker = addMarker(MarkerOptions().position(coordinate))
-                        animateCamera(CameraUpdateFactory.newLatLngZoom(coordinate, 15.0f))
+                        selectedMarker = addMarker(MarkerOptions().position(coordinate).title("Lokasi Pilihan"))
+                        animateCamera(CameraUpdateFactory.newLatLngZoom(coordinate, 10.0f))
                     }
                 }
-            } else {
-                binding.btnAdd.hide()
             }
         })
     }
@@ -226,20 +218,39 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
     }
 
     private fun getAddressFromLocation(latLng: LatLng) {
-        val geocoder = Geocoder(this, Locale.getDefault())
-        var address = mutableListOf<android.location.Address>()
-        lifecycleScope.launch(Dispatchers.IO) {
-            address = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
-            withContext(Dispatchers.Main) {
-                Toast.makeText(this@MainActivity, address[0].adminArea, Toast.LENGTH_SHORT).show()
+        val geocode = Geocoder(this, Locale.getDefault())
+            try {
+                val result = geocode.getFromLocation(latLng.latitude, latLng.longitude, 1)
+                    if (result.size > 0 && result[0] != null && result[0].subLocality != null) {
+                        Toast.makeText(this@MainActivity, result[0].subLocality, Toast.LENGTH_SHORT).show()
+                        with(result[0]) {
+                            selectedAddress = Address(
+                                subLocality?:"Unknown",
+                                subAdminArea?:"Unknown",
+                                adminArea?:"Unknown",
+                                countryName?:"Unknown",
+                                postalCode?:"Unknown",
+                                locality?:"Unknown",
+                                latitude,
+                                longitude
+                            )
+                            binding.btnAdd.show()
+                        }
+                    } else {
+                        Toast.makeText(this@MainActivity, "Tidak ada data untuk koordinat ini", Toast.LENGTH_SHORT).show()
+                    }
+            } catch (e: IOException) {
+                Toast.makeText(this@MainActivity, getString(R.string.error_msg), Toast.LENGTH_SHORT).show()
             }
-        }
     }
 
-
     override fun onMapLongClick(latLng: LatLng) {
+        binding.btnAdd.hide()
         if (selectedMarker != null) {
             selectedMarker?.remove()
+        }
+        if (selectedAddress != null) {
+            selectedAddress = null
         }
         getAddressFromLocation(latLng)
         viewModel.setCurrentSelectedLatLng(latLng)
