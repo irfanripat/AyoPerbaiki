@@ -4,9 +4,8 @@ import com.google.firebase.Timestamp
 
 data class Report(
     val id: Int,
-    val disaster: String,
-    val latitude: Float,
-    val longitude: Float,
+    val disaster: Disaster,
+    val address: Address,
     val timeStamp: Timestamp,
     val description: String,
     val feedback: Feedback,

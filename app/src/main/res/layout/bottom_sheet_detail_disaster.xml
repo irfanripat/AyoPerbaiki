@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottom_sheet_detail"
@@ -16,11 +16,9 @@
         android:layout_width="60dp"
         android:layout_height="4dp"
         android:layout_marginTop="8dp"
+        android:layout_gravity="center_horizontal"
         android:backgroundTint="@android:color/darker_gray"
-        app:cardCornerRadius="45dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:cardCornerRadius="45dp" />
 
     <TextView
         android:id="@+id/textView"
@@ -30,210 +28,280 @@
         android:layout_marginTop="12dp"
         android:fontFamily="@font/open_sans_extrabold"
         android:text="@string/detail_bencana"
+        android:layout_gravity="center_horizontal"
+        android:textAlignment="center"
         android:textColor="@color/font_header"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/top_line" />
+        android:textStyle="bold" />
 
-    <com.mikhaellopez.circularimageview.CircularImageView
-        android:id="@+id/image_disaster_type"
-        android:layout_width="65dp"
-        android:layout_height="65dp"
-        android:layout_gravity="center"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:src="@drawable/ic_banjir_tr"
-        app:civ_border_color="@color/bg_gray"
-        app:civ_border_width="4dp"
-        app:civ_circle_color="@color/bg_gray"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
-
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="wrap_content"
+    <ScrollView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="@+id/image_disaster_type"
-        app:layout_constraintStart_toEndOf="@+id/image_disaster_type"
-        app:layout_constraintTop_toTopOf="@+id/image_disaster_type">
+        android:layout_marginTop="8dp">
 
-        <TextView
-            android:id="@+id/tv_disaster_type"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/open_sans_bold"
-            android:textColor="@color/font_header"
-            android:textSize="17sp"
-            android:textStyle="bold"
-            android:text="Banjir Bandang" />
-
-        <TextView
-            android:id="@+id/tv_disaster_location"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/open_sans_bold"
-            android:textColor="@color/font_gray"
-            android:textSize="14.5sp"
-            android:text="Cilandak, Jakarta" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/container_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="24dp"
-        app:layout_constraintEnd_toStartOf="@+id/container_location"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/image_disaster_type">
-
-        <com.mikhaellopez.circularimageview.CircularImageView
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_gravity="center"
-            android:src="@drawable/ic_time"
-            app:civ_border_color="@color/bg_gray"
-            app:civ_border_width="4dp"
-            app:civ_circle_color="@color/bg_gray" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/open_sans_bold"
-                android:text="@string/waktu_kejadian"
-                android:textColor="@color/font_header"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tv_timestamp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/open_sans_bold"
-                android:textColor="@color/font_gray"
-                android:textSize="13sp"
-                android:text="21 Mei, 2021, 20:15" />
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/container_location"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/container_time"
-        app:layout_constraintTop_toTopOf="@+id/container_time">
-
-        <com.mikhaellopez.circularimageview.CircularImageView
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_gravity="center"
-            android:src="@drawable/ic_location"
-            app:civ_border_color="@color/bg_gray"
-            app:civ_border_width="4dp"
-            app:civ_circle_color="@color/bg_gray" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/open_sans_bold"
-                android:text="@string/lokasi_kejadian"
-                android:textColor="@color/font_header"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tv_location"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/open_sans_bold"
-                android:textColor="@color/font_gray"
-                android:textSize="13sp"
-                android:text="5.5089° LS, 122.0289° BT" />
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cv_disaster_doc"
-        android:layout_width="0dp"
-        android:layout_height="200dp"
-        android:layout_marginTop="16dp"
-        app:cardBackgroundColor="@color/bg_gray"
-        app:cardCornerRadius="10dp"
-        app:cardElevation="0dp"
-        app:layout_constraintEnd_toEndOf="@+id/container_location"
-        app:layout_constraintStart_toStartOf="@+id/container_time"
-        app:layout_constraintTop_toBottomOf="@+id/container_time">
-
-        <ImageView
-            android:id="@+id/image_disaster_doc"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:src="@drawable/sample_image"
-            tools:ignore="ContentDescription" />
+            android:background="#fcfcfc"
+            android:layout_height="wrap_content">
 
-    </androidx.cardview.widget.CardView>
+            <com.mikhaellopez.circularimageview.CircularImageView
+                android:id="@+id/image_disaster_type"
+                android:layout_width="65dp"
+                android:layout_height="65dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:src="@drawable/ic_banjir_tr"
+                app:civ_border_color="@color/bg_gray"
+                app:civ_border_width="4dp"
+                app:civ_circle_color="@color/bg_gray"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cv_disaster_desc"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        app:cardBackgroundColor="@color/bg_gray"
-        app:cardElevation="0dp"
-        app:cardCornerRadius="10dp"
-        app:layout_constraintEnd_toEndOf="@+id/container_location"
-        app:layout_constraintStart_toStartOf="@+id/container_time"
-        app:layout_constraintTop_toBottomOf="@+id/cv_disaster_doc">
+            <LinearLayout
+                android:id="@+id/linearLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="@+id/image_disaster_type"
+                app:layout_constraintStart_toEndOf="@+id/image_disaster_type"
+                app:layout_constraintTop_toTopOf="@+id/image_disaster_type">
 
-        <TextView
-            android:id="@+id/tv_desc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:justificationMode="inter_word"
-            android:text="@string/sample_text"
-            tools:targetApi="o" />
+                <TextView
+                    android:id="@+id/tv_disaster_type"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/open_sans_bold"
+                    tools:text="Banjir Bandang"
+                    android:textColor="@color/font_header"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
 
-    </androidx.cardview.widget.CardView>
+                <TextView
+                    android:id="@+id/tv_disaster_address"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/open_sans_bold"
+                    tools:text="Cilandak, Jakarta"
+                    android:textColor="@color/font_gray"
+                    android:textSize="14.5sp" />
 
-    <Button
-        android:id="@+id/btn_donasi"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:paddingVertical="10dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        android:text="@string/donasi_sekarang"
-        android:backgroundTint="@color/btn_donasi"
-        android:textAllCaps="false"
-        app:layout_constraintEnd_toEndOf="@+id/cv_disaster_doc"
-        app:layout_constraintStart_toStartOf="@+id/cv_disaster_doc"
-        app:layout_constraintTop_toBottomOf="@+id/cv_disaster_desc"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+            </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+            <LinearLayout
+                android:id="@+id/container_time_location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="24dp"
+                android:orientation="horizontal"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/image_disaster_type"
+                android:baselineAligned="false">
+
+                <LinearLayout
+                    android:id="@+id/container_time"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="4dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <com.mikhaellopez.circularimageview.CircularImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_time"
+                        app:civ_border_color="@color/bg_gray"
+                        app:civ_border_width="4dp"
+                        app:civ_circle_color="@color/bg_gray" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/open_sans_bold"
+                            android:text="@string/waktu_kejadian"
+                            android:textColor="@color/font_header"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_disaster_time"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/open_sans_bold"
+                            tools:text="21 Mei, 2021, 20:15"
+                            android:textColor="@color/font_gray"
+                            android:textSize="13sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/container_location"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1.1"
+                    android:orientation="horizontal">
+
+                    <com.mikhaellopez.circularimageview.CircularImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_location"
+                        app:civ_border_color="@color/bg_gray"
+                        app:civ_border_width="4dp"
+                        app:civ_circle_color="@color/bg_gray" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/open_sans_bold"
+                            android:text="@string/lokasi_kejadian"
+                            android:textColor="@color/font_header"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_disaster_latlng"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/open_sans_bold"
+                            tools:text="5.5089° LS, 122.0289° BT"
+                            android:textColor="@color/font_gray"
+                            android:textSize="13sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cv_disaster_doc"
+                android:layout_width="0dp"
+                android:layout_height="200dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="@color/bg_gray"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/container_time_location">
+
+                <ImageView
+                    android:id="@+id/image_disaster"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/sample_image"
+                    tools:ignore="ContentDescription" />
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cv_disaster_desc"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="@color/bg_gray"
+                app:cardCornerRadius="10dp"
+                android:layout_marginBottom="16dp"
+                app:layout_constraintBottom_toTopOf="@id/cv_disaster_feedback"
+                app:cardElevation="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cv_disaster_doc">
+
+                <TextView
+                    android:id="@+id/tv_disaster_desc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:justificationMode="inter_word"
+                    android:padding="8dp"
+                    android:text="@string/sample_text"
+                    tools:targetApi="o" />
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cv_disaster_feedback"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@color/bg_gray"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cv_disaster_desc">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:justificationMode="inter_word"
+                        android:paddingTop="8dp"
+                        android:paddingHorizontal="8dp"
+                        android:text="@string/feedback"
+                        android:textStyle="bold"
+                        tools:targetApi="o" />
+
+                    <TextView
+                        android:id="@+id/tv_disaster_feedback"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:justificationMode="inter_word"
+                        android:padding="8dp"
+                        android:text="@string/sample_text"
+                        tools:targetApi="o" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+
+
+<!--    <Button-->
+<!--        android:id="@+id/btn_donasi"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:paddingVertical="10dp"-->
+<!--        android:layout_marginTop="16dp"-->
+<!--        android:layout_marginBottom="16dp"-->
+<!--        android:text="@string/donasi_sekarang"-->
+<!--        android:backgroundTint="@color/btn_donasi"-->
+<!--        android:textAllCaps="false"-->
+<!--        app:layout_constraintEnd_toEndOf="@+id/cv_disaster_doc"-->
+<!--        app:layout_constraintStart_toStartOf="@+id/cv_disaster_doc"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/cv_disaster_desc"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"/>-->
+
+</LinearLayout>
