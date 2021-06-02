@@ -1,11 +1,17 @@
 package com.capstone.ayoperbaiki.form
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.doOnTextChanged
 import com.capstone.ayoperbaiki.R
@@ -34,7 +40,8 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
             elevation = 4f
         }
 
-        initEditText()
+        initForm()
+        initCamera()
     }
 
     override fun onResume() {
@@ -45,7 +52,7 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
     }
 
 
-    private fun initEditText() {
+    private fun initForm() {
         var tipeBencana: String = bindingForm.edtTipeBencana.text.toString() //sudah
         var waktuBencana: String = bindingForm.edtWaktuBencana.text.toString() //sudah
         var lokasiBencana: String = bindingForm.edtLokasiBencana.text.toString() //sudah
@@ -53,12 +60,12 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
         var gambarBencana: Bitmap? = null
         var linkDonasi: String = bindingForm.edtLinkDonasi.text.toString()
 
-        bindingForm.edtTipeBencana.setOnItemClickListener { parent, view, position, id ->
+        bindingForm.edtTipeBencana.setOnItemClickListener { parent, _, position, _ ->
             val item = parent.getItemAtPosition(position).toString()
             when {
                 item == "Lainnya" -> {
                     bindingForm.actvTipeBencana2.visible()
-                    bindingForm.edtTipeBencana2.doOnTextChanged { text, start, before, count ->
+                    bindingForm.edtTipeBencana2.doOnTextChanged { text, _, _, _ ->
                         if(text != null) when {
                             text.isEmpty() -> {
                                 bindingForm.actvTipeBencana2.apply {
@@ -72,8 +79,6 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
                                 bindingForm.actvTipeBencana2.apply {
                                     isErrorEnabled = false
                                     isHelperTextEnabled = false
-                                    
-                                    
                                 }
                             }
                         }
@@ -95,7 +100,7 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
             waktuBencana = bindingForm.edtWaktuBencana.text.toString().trim()
         }
 
-        bindingForm.edtLokasiBencana.doOnTextChanged { text, start, before, count ->
+        bindingForm.edtLokasiBencana.doOnTextChanged { text, _, _, _ ->
             if(text != null) when {
                 text.isEmpty() -> {
                     bindingForm.actvLokasiBencana.apply {
@@ -115,7 +120,7 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
             }
         }
 
-        bindingForm.edtKeteranganBencana.doOnTextChanged { text, start, before, count ->
+        bindingForm.edtKeteranganBencana.doOnTextChanged { text, _, _, _ ->
             if(text != null) when {
                 text.isEmpty() -> {
                     bindingForm.actvKeteranganBencana.apply {
@@ -136,7 +141,7 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
             }
         }
 
-        bindingForm.edtLinkDonasi.doOnTextChanged { text, start, before, count ->
+        bindingForm.edtLinkDonasi.doOnTextChanged { text, _, _, _ ->
             if(text != null) {
                 linkDonasi = bindingForm.edtLinkDonasi.text.toString().trim()
             }
@@ -148,6 +153,39 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
 
         Log.d(TAG, "initEditText: Isi data form\n$tipeBencana $waktuBencana $lokasiBencana $keteranganBencana $linkDonasi")
     }
+
+    private fun initCamera() {
+
+        bindingForm.btnOpenCamera.setOnClickListener {
+            if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED){
+                ActivityCompat.requestPermissions(this, REQUIRED_PERMISSION, CAPTURE_IMAGE_REQUEST_CODE)
+
+            }
+
+
+            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            startActivityForResult(intent, CAPTURE_IMAGE_REQUEST_CODE)
+
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when(requestCode){
+            CAPTURE_IMAGE_REQUEST_CODE -> {
+                val capturedImage = data?.extras?.get("data") as? Bitmap
+                Log.d(TAG, "onActivityResult: hasil bitmap $capturedImage")
+
+                if(capturedImage != null) {
+                    bindingForm.imgDisaster.setImageBitmap(capturedImage)
+                } else {
+                    bindingForm.imgDisaster.setImageDrawable(resources.getDrawable(R.drawable.placeholder_image))
+                }
+            }
+        }
+    }
+
 
     override fun onDialogDateSet(tag: String?, year: Int, month: Int, dayOfMonth: Int) {
 
@@ -166,7 +204,8 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
     companion object{
         private val TAG = DisasterReportFormActivity::class.java.simpleName
         private const val DATE_PICKER_TAG = "DatePicker"
-
+        private val REQUIRED_PERMISSION = arrayOf(Manifest.permission.CAMERA)
+        private const val CAPTURE_IMAGE_REQUEST_CODE = 101
     }
 
 }
