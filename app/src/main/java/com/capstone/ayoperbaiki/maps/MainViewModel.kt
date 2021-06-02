@@ -21,21 +21,28 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(private val reportUseCase: ReportUseCase) : ViewModel() {
 
     private val _listReport = MutableLiveData<Resource<List<Report>>>()
+    private val _selectedLatLang = MutableLiveData<LatLng?>()
 
     val listReport : LiveData<Resource<List<Report>>> = _listReport
+    val selectedLatLng : LiveData<LatLng?> = _selectedLatLang
 
     init {
         getAllReport()
+        _selectedLatLang.value = null
     }
 
-    fun getAllReport() {
+    private fun getAllReport() {
         _listReport.value = Resource.Loading()
         viewModelScope.launch {
             _listReport.postValue(reportUseCase.getAllReport())
         }
     }
 
-    fun generateDummyReport() {
+    fun setCurrentSelectedLatLng(latLng: LatLng) {
+        _selectedLatLang.value = latLng
+    }
+
+    private fun generateDummyReport() {
         viewModelScope.launch {
             for (i in 1..6) {
                 reportUseCase.submitReport(
@@ -62,7 +69,7 @@ class MainViewModel @Inject constructor(private val reportUseCase: ReportUseCase
         }
     }
 
-    val arrayLatLng = arrayListOf<LatLng>(
+    private val arrayLatLng = arrayListOf(
             LatLng(-3.5266503115308727, 119.79263751453715),
             LatLng(-6.823073929202724, 107.29646024499053),
             LatLng(-3.3382121019996123, 136.38827854245358),
