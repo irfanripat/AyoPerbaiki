@@ -1,6 +1,7 @@
 package com.capstone.ayoperbaiki.maps
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.location.Geocoder
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -17,6 +18,7 @@ import com.capstone.ayoperbaiki.core.data.source.firebase.response.AddressRespon
 import com.capstone.ayoperbaiki.core.domain.model.Address
 import com.capstone.ayoperbaiki.core.domain.model.Report
 import com.capstone.ayoperbaiki.databinding.ActivityMainBinding
+import com.capstone.ayoperbaiki.form.DisasterReportFormActivity
 import com.capstone.ayoperbaiki.utils.Disaster.mapDisasterIcon
 import com.capstone.ayoperbaiki.utils.Utils.STARTING_COORDINATE
 import com.capstone.ayoperbaiki.utils.Utils.hide
@@ -54,9 +56,10 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
         initBinding()
         initMapFragment()
         initBottomSheet()
-//        binding.btnAdd.setOnClickListener {
-////            addNewReport(add)
-//        }
+        binding.btnAdd.setOnClickListener {
+            startActivity(Intent(this, DisasterReportFormActivity::class.java))
+//            addNewReport(add)
+        }
         observeAllReport()
         observeSelectedLatLang()
     }
