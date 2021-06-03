@@ -12,6 +12,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.capstone.ayoperbaiki.BuildConfig
 import com.capstone.ayoperbaiki.R
 import com.capstone.ayoperbaiki.core.data.Resource
 import com.capstone.ayoperbaiki.core.domain.model.Address
@@ -73,15 +74,14 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
 
     private fun initPlaceAutoComplete() {
         if (!Places.isInitialized()) {
-            Places.initialize(applicationContext, "AIzaSyAEXpgW8PcKtV15ziDOj0jqefx9glt5Olw")
+            Places.initialize(applicationContext, BuildConfig.MAPS_API_KEY)
         }
 
-        val autocompleteFragment =
-            supportFragmentManager.findFragmentById(R.id.autocomplete_fragment) as AutocompleteSupportFragment?
+        val autocompleteFragment = supportFragmentManager.findFragmentById(R.id.autocomplete_fragment) as AutocompleteSupportFragment?
 
         autocompleteFragment!!.setPlaceFields(listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG))
 
-        autocompleteFragment.setHint("Ketik lokasi, tempat...")
+        autocompleteFragment.setHint(getString(R.string.search_view_hint))
 
         autocompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
             override fun onPlaceSelected(place: Place) {

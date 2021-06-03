@@ -14,6 +14,10 @@ android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
 
+    def Properties properties = new Properties()
+    properties.load(project.rootProject.file("local.properties").newDataInputStream())
+
+
     defaultConfig {
         applicationId "com.capstone.ayoperbaiki"
         minSdkVersion 21
@@ -22,6 +26,7 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        resValue "string", "default_account_iccid", properties.getProperty("MAPS_API_KEY", "")
     }
 
     buildTypes {
