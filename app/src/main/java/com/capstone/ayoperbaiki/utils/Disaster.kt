@@ -13,6 +13,37 @@ object Disaster {
             6 to "Gunung Meletus"
     )
 
+    fun generateDisaster(): List<String>{
+       return ArrayList<String>().apply {
+           mapDisaster.forEach {
+               this.add(it.value)
+           }
+       }
+    }
+
+    val mapKerusakanInfrastruktur = mapOf(
+            1 to "Jaringan Listrik",
+            2 to "Jalan Raya",
+            3 to "Jembatan",
+            4 to "Jalur Kereta Api",
+            5 to "Bandara",
+            6 to "Pelabuhan",
+            7 to "Terminal",
+            8 to "Pasar",
+            9 to "Sekolah",
+            10 to "Stadion",
+            11 to "Puskesmas",
+            12 to "Bendungan"
+    )
+
+    fun generateKerusakanInfrastruktur2(): List<String>{
+       return ArrayList<String>().apply {
+           mapKerusakanInfrastruktur.forEach {
+               this.add(it.value)
+           }
+       }
+    }
+
     val mapDisasterIcon = mapOf(
             1 to R.drawable.ic_banjir,
             2 to R.drawable.ic_kebakaran,

@@ -17,11 +17,13 @@ import androidx.core.widget.doOnTextChanged
 import com.capstone.ayoperbaiki.R
 import com.capstone.ayoperbaiki.databinding.ActivityDisasterReportFormBinding
 import com.capstone.ayoperbaiki.databinding.DisasterReportFormBinding
+import com.capstone.ayoperbaiki.utils.Disaster
 import com.capstone.ayoperbaiki.utils.gone
 import com.capstone.ayoperbaiki.utils.visible
 import com.dicoding.picodiploma.myalarmmanager.utils.DatePickerFragment
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.DialogDateListener{
 
@@ -36,7 +38,7 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
 
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
-            title = "Disaster Report Form"
+            title = "Formulir Kerusakan Infrastruktur"
             elevation = 4f
         }
 
@@ -46,14 +48,26 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
 
     override fun onResume() {
         super.onResume()
-        val disasterList = resources.getStringArray(R.array.list_disaster)
+
+        //Init dropdown kategori bencana
+        val disasterList = Disaster.generateDisaster() as ArrayList<String>
+        disasterList.add("Lainnya")
+        Log.d(TAG, "onResume: list disaster $disasterList")
         val arrayAdapter = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, disasterList)
         bindingForm.edtTipeBencana.setAdapter(arrayAdapter)
+
+        //Init dropdown tipe kerusakan infrastruktur
+        val kerusakanList = Disaster.generateKerusakanInfrastruktur2() as ArrayList<String>
+        kerusakanList.add("Lainnya")
+        Log.d(TAG, "onResume: list disaster $kerusakanList")
+        val arrayAdapter2 = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, kerusakanList)
+        bindingForm.edtTipeKerusakanInfrastruktur.setAdapter(arrayAdapter2)
     }
 
 
     private fun initForm() {
         var tipeBencana: String = bindingForm.edtTipeBencana.text.toString() //sudah
+        var tipeKerusakanInfrastruktur: String = bindingForm.edtTipeKerusakanInfrastruktur.text.toString() //sudah
         var waktuBencana: String = bindingForm.edtWaktuBencana.text.toString() //sudah
         var lokasiBencana: String = bindingForm.edtLokasiBencana.text.toString() //sudah
         var keteranganBencana: String = bindingForm.edtKeteranganBencana.text.toString() //sudah
@@ -88,6 +102,38 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
                 item != "Lainnya" -> {
                     bindingForm.actvTipeBencana2.gone()
                     tipeBencana = bindingForm.edtTipeBencana.text.toString().trim()
+                }
+            }
+        }
+
+        bindingForm.edtTipeKerusakanInfrastruktur.setOnItemClickListener { parent, _, position, _ ->
+            val item = parent.getItemAtPosition(position).toString()
+            when {
+                item == "Lainnya" -> {
+                    bindingForm.actvTipeKerusakanInfrastruktur2.visible()
+                    bindingForm.edtTipeKerusakanInfrastruktur2.doOnTextChanged { text, _, _, _ ->
+                        if(text != null) when {
+                            text.isEmpty() -> {
+                                bindingForm.actvTipeKerusakanInfrastruktur2.apply {
+                                    error = getString(R.string.required_text_field)
+                                    isHelperTextEnabled = true
+                                    isErrorEnabled = true
+                                    errorIconDrawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_error, null)
+                                }
+                            }
+                            text.isNotEmpty() -> {
+                                bindingForm.actvTipeKerusakanInfrastruktur2.apply {
+                                    isErrorEnabled = false
+                                    isHelperTextEnabled = false
+                                }
+                            }
+                        }
+                        tipeKerusakanInfrastruktur = bindingForm.edtTipeKerusakanInfrastruktur2.text.toString().trim()
+                    }
+                }
+                item != "Lainnya" -> {
+                    bindingForm.actvTipeKerusakanInfrastruktur2.gone()
+                    tipeKerusakanInfrastruktur = bindingForm.edtTipeKerusakanInfrastruktur.text.toString().trim()
                 }
             }
         }
@@ -151,7 +197,7 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
 
         }
 
-        Log.d(TAG, "initEditText: Isi data form\n$tipeBencana $waktuBencana $lokasiBencana $keteranganBencana $linkDonasi")
+        Log.d(TAG, "initEditText: Isi data form\n$tipeBencana $tipeKerusakanInfrastruktur $waktuBencana $lokasiBencana $keteranganBencana $linkDonasi")
     }
 
     private fun initCamera() {
@@ -178,14 +224,13 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
                 Log.d(TAG, "onActivityResult: hasil bitmap $capturedImage")
 
                 if(capturedImage != null) {
-                    bindingForm.imgDisaster.setImageBitmap(capturedImage)
+                    bindingForm.imgKerusakanInfrastruktur.setImageBitmap(capturedImage)
                 } else {
-                    bindingForm.imgDisaster.setImageDrawable(resources.getDrawable(R.drawable.placeholder_image))
+                    bindingForm.imgKerusakanInfrastruktur.setImageDrawable(resources.getDrawable(R.drawable.placeholder_image))
                 }
             }
         }
     }
-
 
     override fun onDialogDateSet(tag: String?, year: Int, month: Int, dayOfMonth: Int) {
 
@@ -200,11 +245,10 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
     }
 
 
-
     companion object{
         private val TAG = DisasterReportFormActivity::class.java.simpleName
-        private const val DATE_PICKER_TAG = "DatePicker"
         private val REQUIRED_PERMISSION = arrayOf(Manifest.permission.CAMERA)
+        private const val DATE_PICKER_TAG = "DatePicker"
         private const val CAPTURE_IMAGE_REQUEST_CODE = 101
     }
 
