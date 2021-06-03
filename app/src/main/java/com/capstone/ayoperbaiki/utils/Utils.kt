@@ -20,4 +20,6 @@ object Utils {
 
     val STARTING_COORDINATE = LatLng(-2.44565,117.8888)
 
+    const val EXTRA_ADDRESS = "extra_address"
+
 }
