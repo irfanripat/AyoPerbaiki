@@ -10,6 +10,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.capstone.ayoperbaiki.R
 import com.capstone.ayoperbaiki.core.data.Resource
@@ -36,6 +37,9 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPS
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
 import com.google.firebase.Timestamp
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -272,33 +276,41 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
 
     private fun getAddressFromLocation(latLng: LatLng) {
         val geocode = Geocoder(this, Locale.getDefault())
+        lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val result = geocode.getFromLocation(latLng.latitude, latLng.longitude, 1)
-                    if (result.size > 0 && result[0] != null && result[0].subLocality != null) {
+                if (result.size > 0 && result[0] != null && result[0].subLocality != null) {
+                    withContext(Dispatchers.Main) {
                         Toast.makeText(this@MainActivity, result[0].subLocality, Toast.LENGTH_SHORT).show()
                         with(result[0]) {
                             selectedAddress = Address(
-                                subLocality ?: "Unknown",
-                                subAdminArea ?: "Unknown",
-                                adminArea ?: "Unknown",
-                                countryName ?: "Unknown",
-                                postalCode ?: "Unknown",
-                                locality ?: "Unknown",
-                                latitude,
-                                longitude
+                                    subLocality ?: "Unknown",
+                                    subAdminArea ?: "Unknown",
+                                    adminArea ?: "Unknown",
+                                    countryName ?: "Unknown",
+                                    postalCode ?: "Unknown",
+                                    locality ?: "Unknown",
+                                    latitude,
+                                    longitude
                             )
                             binding.btnAdd.show()
                         }
-                    } else {
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
                         Toast.makeText(
-                            this@MainActivity,
-                            getString(R.string.no_return_address),
-                            Toast.LENGTH_SHORT
+                                this@MainActivity,
+                                getString(R.string.no_return_address),
+                                Toast.LENGTH_SHORT
                         ).show()
                     }
+                }
             } catch (e: IOException) {
-                Toast.makeText(this@MainActivity, getString(R.string.error_msg), Toast.LENGTH_SHORT).show()
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@MainActivity, getString(R.string.error_msg), Toast.LENGTH_SHORT).show()
+                }
             }
+        }
     }
 
     override fun onMapLongClick(latLng: LatLng) {
