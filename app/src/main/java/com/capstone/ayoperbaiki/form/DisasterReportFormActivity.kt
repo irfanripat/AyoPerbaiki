@@ -17,9 +17,12 @@ import androidx.core.widget.doOnTextChanged
 import com.capstone.ayoperbaiki.R
 import com.capstone.ayoperbaiki.databinding.ActivityDisasterReportFormBinding
 import com.capstone.ayoperbaiki.databinding.DisasterReportFormBinding
+import com.capstone.ayoperbaiki.ml.BlurImageModel
 import com.capstone.ayoperbaiki.utils.gone
 import com.capstone.ayoperbaiki.utils.visible
 import com.dicoding.picodiploma.myalarmmanager.utils.DatePickerFragment
+import org.tensorflow.lite.schema.Model
+import org.tensorflow.lite.support.image.TensorImage
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -176,9 +179,9 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
             CAPTURE_IMAGE_REQUEST_CODE -> {
                 val capturedImage = data?.extras?.get("data") as? Bitmap
                 Log.d(TAG, "onActivityResult: hasil bitmap $capturedImage")
-
                 if(capturedImage != null) {
                     bindingForm.imgDisaster.setImageBitmap(capturedImage)
+                    validateImage(capturedImage)
                 } else {
                     bindingForm.imgDisaster.setImageDrawable(resources.getDrawable(R.drawable.placeholder_image))
                 }
@@ -197,6 +200,18 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
 
         //Set text dari textview once
         bindingForm.edtWaktuBencana.setText(dateFormat.format(calendar.time))
+    }
+
+    private fun validateImage(bitmap: Bitmap?) {
+        val model = BlurImageModel.newInstance(this)
+
+        val image = TensorImage.fromBitmap(bitmap)
+
+        val outputs = model.process(image)
+        val probability = outputs.probabilityAsCategoryList
+        Toast.makeText(this, probability.toString(), Toast.LENGTH_SHORT).show()
+
+        model.close()
     }
 
 
