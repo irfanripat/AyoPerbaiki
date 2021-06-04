@@ -1,17 +1,21 @@
 package com.capstone.ayoperbaiki.form
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import androidx.appcompat.app.AppCompatActivity
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.doOnTextChanged
 import com.capstone.ayoperbaiki.R
@@ -21,14 +25,22 @@ import com.capstone.ayoperbaiki.utils.Disaster
 import com.capstone.ayoperbaiki.utils.gone
 import com.capstone.ayoperbaiki.utils.visible
 import com.dicoding.picodiploma.myalarmmanager.utils.DatePickerFragment
+import java.io.File
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.DialogDateListener{
+
+class DisasterReportFormActivity
+    : AppCompatActivity(), DatePickerFragment.DialogDateListener{
 
     private lateinit var binding: ActivityDisasterReportFormBinding
     private lateinit var bindingForm: DisasterReportFormBinding
+    private lateinit var outputImagePath: String
+    private lateinit var capturedImage: String
+    private lateinit var capturedImage1: String
+    private lateinit var capturedImage2: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,8 +54,14 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
             elevation = 4f
         }
 
+        if(isPermissionGranted()){
+            initCamera()
+            Toast.makeText(this, "Permission already granted", Toast.LENGTH_SHORT).show()
+        } else {
+            ActivityCompat.requestPermissions(this, REQUIRED_PERMISSION, PERMISSION_REQUEST_CODE)
+        }
+
         initForm()
-        initCamera()
     }
 
     override fun onResume() {
@@ -64,14 +82,12 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
         bindingForm.edtTipeKerusakanInfrastruktur.setAdapter(arrayAdapter2)
     }
 
-
     private fun initForm() {
         var tipeBencana: String = bindingForm.edtTipeBencana.text.toString() //sudah
         var tipeKerusakanInfrastruktur: String = bindingForm.edtTipeKerusakanInfrastruktur.text.toString() //sudah
         var waktuBencana: String = bindingForm.edtWaktuBencana.text.toString() //sudah
         var lokasiBencana: String = bindingForm.edtLokasiBencana.text.toString() //sudah
         var keteranganBencana: String = bindingForm.edtKeteranganBencana.text.toString() //sudah
-        var gambarBencana: Bitmap? = null
         var linkDonasi: String = bindingForm.edtLinkDonasi.text.toString()
 
         bindingForm.edtTipeBencana.setOnItemClickListener { parent, _, position, _ ->
@@ -203,16 +219,75 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
     private fun initCamera() {
 
         bindingForm.btnOpenCamera.setOnClickListener {
-            if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED){
-                ActivityCompat.requestPermissions(this, REQUIRED_PERMISSION, CAPTURE_IMAGE_REQUEST_CODE)
+            startCamera(CAPTURE_IMAGE_REQUEST_CODE)
+        }
+        bindingForm.btnOpenCamera2.setOnClickListener {
+            startCamera(CAPTURE_IMAGE2_REQUEST_CODE)
+        }
+        bindingForm.btnOpenCamera3.setOnClickListener {
+            startCamera(CAPTURE_IMAGE3_REQUEST_CODE)
+        }
+    }
 
+
+    private fun isPermissionGranted(): Boolean {
+        return REQUIRED_PERMISSION.all {
+            ContextCompat.checkSelfPermission(baseContext, it) != PackageManager.PERMISSION_GRANTED
+        }
+    }
+
+    private fun startCamera(requestCode: Int) {
+        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
+            takePictureIntent.resolveActivity(packageManager)?.also {
+
+                val photoFile: File? = try {
+                    createImageFile()
+                } catch (ex: IOException) {
+                    Toast.makeText(applicationContext, "Error while saving picture.", Toast.LENGTH_LONG).show();
+                    Log.d(TAG, "startCamera: Error create Image File : \n${ex.message}")
+                    null
+                }
+
+                // Continue only if the File was successfully created
+                photoFile?.also {
+                    val photoURI: Uri = FileProvider.getUriForFile(
+                        this,
+                        "com.capstone.ayoperbaiki.fileprovider",
+                        it
+                    )
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+                    startActivityForResult(takePictureIntent, requestCode)
+                }
             }
+        }
+    }
 
+    @Throws(IOException::class)
+    private fun createImageFile(): File {
+        // Create an image file name
+        val timeStamp: String = SimpleDateFormat(IMAGE_FILE_FORMAT, Locale.getDefault()).format(System.currentTimeMillis())
+        val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(
+            "JPEG_${timeStamp}_", /* prefix */
+            ".jpg", /* suffix */
+            storageDir /* directory */
+        ).apply {
+            // Save a file: path for use with ACTION_VIEW intents
+            outputImagePath = absolutePath
+        }
+    }
 
-            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            startActivityForResult(intent, CAPTURE_IMAGE_REQUEST_CODE)
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
+        if(isPermissionGranted()){
+            initCamera()
+        } else {
+            Toast.makeText(this, "Permission camera has been denied by user", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -220,14 +295,23 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
         super.onActivityResult(requestCode, resultCode, data)
         when(requestCode){
             CAPTURE_IMAGE_REQUEST_CODE -> {
-                val capturedImage = data?.extras?.get("data") as? Bitmap
-                Log.d(TAG, "onActivityResult: hasil bitmap $capturedImage")
+                if(resultCode == RESULT_OK){
 
-                if(capturedImage != null) {
-                    bindingForm.imgKerusakanInfrastruktur.setImageBitmap(capturedImage)
+                    //Untuk mengambil hasil gambar full berdasarkan path
+                    val imgFile: File = File(outputImagePath)
+                    if (imgFile.exists()) {
+                        bindingForm.imgKerusakanInfrastruktur.setImageURI(Uri.fromFile(imgFile))
+                    }
+
                 } else {
-                    bindingForm.imgKerusakanInfrastruktur.setImageDrawable(resources.getDrawable(R.drawable.placeholder_image))
+                    bindingForm.imgKerusakanInfrastruktur.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.placeholder_image, null))
                 }
+            }
+            CAPTURE_IMAGE2_REQUEST_CODE -> {
+
+            }
+            CAPTURE_IMAGE3_REQUEST_CODE -> {
+
             }
         }
     }
@@ -249,7 +333,11 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
         private val TAG = DisasterReportFormActivity::class.java.simpleName
         private val REQUIRED_PERMISSION = arrayOf(Manifest.permission.CAMERA)
         private const val DATE_PICKER_TAG = "DatePicker"
+        private const val IMAGE_FILE_FORMAT = "yy-MM-dd-HH-mm-ss-SSS"
+        private const val PERMISSION_REQUEST_CODE = 100
         private const val CAPTURE_IMAGE_REQUEST_CODE = 101
+        private const val CAPTURE_IMAGE2_REQUEST_CODE = 102
+        private const val CAPTURE_IMAGE3_REQUEST_CODE = 103
     }
 
 }

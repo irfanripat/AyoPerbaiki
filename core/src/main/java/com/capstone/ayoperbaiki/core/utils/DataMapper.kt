@@ -18,7 +18,7 @@ object DataMapper {
                 timeStamp = it.timeStamp,
                 description = it.description,
                 feedback = Feedback(it.feedback.status, it.feedback.description),
-                photoUri = it.photoUri
+                photoUri = it.photoUri,
             )
             reportList.add(report)
         }

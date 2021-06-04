@@ -9,6 +9,7 @@
     <string name="feedback_if_false">Belum ada tindak lanjut</string>
     <string name="error_msg">Gagal mengambil data, pastikan koneksi internet anda tidak bermasalah</string>
     <string name="required_text_field">*wajib diisi</string>
+    <string name="captured_image">Captured Photos</string>
 
     <string-array name="list_disaster">
         <item>Gempa Vulkanik</item>

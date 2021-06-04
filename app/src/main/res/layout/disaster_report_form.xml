@@ -24,6 +24,7 @@
                 android:id="@+id/edt_tipe_bencana"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textSize="16sp"
                 android:hint="Kategori Bencana"
                 android:inputType="none"
                 tools:ignore="LabelFor" />
@@ -44,6 +45,7 @@
                 android:id="@+id/edt_tipe_bencana2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textSize="16sp"
                 android:hint="Tuliskan disini"
                 android:importantForAutofill="no"
                 android:inputType="text"
@@ -64,6 +66,7 @@
             <AutoCompleteTextView
                 android:id="@+id/edt_tipe_kerusakan_infrastruktur"
                 android:layout_width="match_parent"
+                android:textSize="16sp"
                 android:layout_height="wrap_content"
                 android:hint="Tipe Kerusakan Infrastruktur"
                 android:inputType="none"
@@ -85,6 +88,7 @@
                 android:id="@+id/edt_tipe_kerusakan_infrastruktur2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textSize="16sp"
                 android:hint="Tuliskan disini"
                 android:importantForAutofill="no"
                 android:inputType="text"
@@ -109,6 +113,7 @@
                 android:id="@+id/edt_waktu_bencana"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textSize="16sp"
                 android:importantForAutofill="no"
                 android:hint="Waktu kejadian"
                 android:inputType="none"
@@ -130,6 +135,7 @@
                 android:id="@+id/edt_lokasi_bencana"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textSize="16sp"
                 android:hint="Lokasi kejadian"
                 android:importantForAutofill="no"
                 android:inputType="none"
@@ -151,6 +157,7 @@
                 android:id="@+id/edt_keterangan_bencana"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textSize="16sp"
                 android:gravity="start"
                 android:importantForAutofill="no"
                 android:inputType="textMultiLine"
@@ -162,40 +169,111 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/linearLayoutCompat"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical">
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Bukti kerusakan infrastruktur umum :" />
-
-            <Button
-                android:id="@+id/btn_open_camera"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:layout_gravity="center"
-                android:textAllCaps="false"
-                android:drawableLeft="@drawable/ic_camera"
-                android:drawableTint="@color/white"
-                android:text="Ambil Gambar"
-                tools:targetApi="m" />
+                android:text="Dokumentasi kerusakan infrastruktur :" />
 
-            <ImageView
-                android:id="@+id/img_kerusakan_infrastruktur"
+            <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="16dp"
-                android:requiresFadingEdge="vertical"
-                android:adjustViewBounds="true"
-                android:contentDescription="Gambar Kerusakan Infrastruktur"
-                android:src="@drawable/placeholder_image"
-                tools:src="@tools:sample/backgrounds/scenic" />
+                android:layout_marginVertical="8dp"
+                android:orientation="vertical"
+                >
+                <Button
+                    android:id="@+id/btn_open_camera"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:layout_marginTop="4dp"
+                    android:layout_gravity="center"
+                    android:textAllCaps="false"
+                    android:drawableLeft="@drawable/ic_camera"
+                    android:drawableTint="@color/white"
+                    android:drawablePadding="8dp"
+                    android:text="Ambil\nGambar"
+                    tools:targetApi="m" />
+
+                <ImageView
+                    android:id="@+id/img_kerusakan_infrastruktur"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="8dp"
+                    android:requiresFadingEdge="vertical"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="Gambar Kerusakan Infrastruktur"
+                    android:src="@drawable/placeholder_image"
+                     />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="8dp"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                >
+                <Button
+                    android:id="@+id/btn_open_camera2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_gravity="center"
+                    android:textAllCaps="false"
+                    android:drawableLeft="@drawable/ic_camera"
+                    android:drawableTint="@color/white"
+                    android:text="Ambil\nGambar"
+                    tools:targetApi="m" />
+
+                <ImageView
+                    android:id="@+id/img_kerusakan_infrastruktur2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="8dp"
+                    android:requiresFadingEdge="vertical"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="Gambar Kerusakan Infrastruktur"
+                    android:src="@drawable/placeholder_image"
+                    tools:src="@tools:sample/backgrounds/scenic" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="8dp"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                >
+                <Button
+                    android:id="@+id/btn_open_camera3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_gravity="center"
+                    android:textAllCaps="false"
+                    android:drawableLeft="@drawable/ic_camera"
+                    android:drawableTint="@color/white"
+                    android:text="Ambil\nGambar"
+                    tools:targetApi="m" />
+
+                <ImageView
+                    android:id="@+id/img_kerusakan_infrastruktur3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="8dp"
+                    android:requiresFadingEdge="vertical"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="Gambar Kerusakan Infrastruktur"
+                    android:src="@drawable/placeholder_image"
+                    tools:src="@tools:sample/backgrounds/scenic" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
         </androidx.appcompat.widget.LinearLayoutCompat>
+
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/actv_link_donasi"
@@ -203,6 +281,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:visibility="gone"
             android:hint="Donasi"
             app:boxStrokeColor="@color/ss_top"
             app:helperText="*optional"
@@ -227,6 +306,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:paddingVertical="16dp"
+            android:textSize="16sp"
             android:textStyle="bold"
             android:text="Laporkan Sekarang"
             />
