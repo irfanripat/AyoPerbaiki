@@ -32,21 +32,19 @@
                 android:resource="@xml/file_paths"/>
         </provider>
 
-        <activity android:name=".form.DisasterReportFormActivity">
+        <activity android:name=".form.DisasterReportFormActivity"/>
+        <activity android:name=".splashscreen.SplashScreenActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".splashscreen.SplashScreenActivity">
-
-        </activity>
         <activity android:name=".maps.MainActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="$AIzaSyC7Xyv2yogvVBSrbLPZArZZ6muk1kyA7L0" />
+            android:value="${MAPS_API_KEY}" />
     </application>
 
 </manifest>

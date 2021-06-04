@@ -12,9 +12,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/autocomplete_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:background="@color/white"
+        android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment" />
+
     <SearchView
         android:id="@+id/searchView"
         android:padding="5dp"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:iconifiedByDefault="false"
@@ -26,6 +35,7 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btn_add"
+        android:visibility="invisible"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
