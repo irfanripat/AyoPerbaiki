@@ -23,6 +23,7 @@ import com.capstone.ayoperbaiki.utils.visible
 import com.dicoding.picodiploma.myalarmmanager.utils.DatePickerFragment
 import org.tensorflow.lite.schema.Model
 import org.tensorflow.lite.support.image.TensorImage
+import org.tensorflow.lite.support.label.Category
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -209,8 +210,7 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
 
         val outputs = model.process(image)
         val probability = outputs.probabilityAsCategoryList
-        Toast.makeText(this, probability.toString(), Toast.LENGTH_SHORT).show()
-
+        val output = probability.single { category ->  category.score > 0.5}
         model.close()
     }
 
