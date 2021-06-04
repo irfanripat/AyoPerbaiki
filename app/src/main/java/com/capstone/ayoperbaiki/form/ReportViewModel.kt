@@ -20,12 +20,11 @@ class ReportViewModel @Inject constructor(private val reportUseCase: ReportUseCa
 
     val submitReportStatus : LiveData<Resource<Boolean>> = _submitReportStatus
 
-    fun submitReport(report: Report) {
+    fun submitReport(report: Report)  {
+        _submitReportStatus.value = Resource.Loading()
         viewModelScope.launch {
-            reportUseCase.submitReport(report)
+            _submitReportStatus.postValue(reportUseCase.submitReport(report))
         }
     }
-
-
 
 }

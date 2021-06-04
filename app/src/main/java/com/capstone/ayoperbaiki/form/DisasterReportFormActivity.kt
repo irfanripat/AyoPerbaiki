@@ -19,6 +19,7 @@ import androidx.core.content.FileProvider
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.doOnTextChanged
 import com.capstone.ayoperbaiki.R
+import com.capstone.ayoperbaiki.core.data.Resource
 import com.capstone.ayoperbaiki.core.domain.model.Address
 import com.capstone.ayoperbaiki.core.domain.model.Report
 import com.capstone.ayoperbaiki.databinding.ActivityDisasterReportFormBinding
@@ -35,6 +36,7 @@ import com.capstone.ayoperbaiki.utils.Utils.EXTRA_DATA_ADDRESS
 import com.capstone.ayoperbaiki.utils.Utils.IMAGE_FILE_FORMAT
 import com.capstone.ayoperbaiki.utils.Utils.PERMISSION_REQUEST_CODE
 import com.capstone.ayoperbaiki.utils.Utils.REQUIRED_PERMISSION
+import com.google.firebase.Timestamp
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.*
@@ -198,13 +200,10 @@ class DisasterReportFormActivity
         }
 
         bindingForm.btnSubmitForm.setOnClickListener {
-            // TODO: 04/06/2021 Membuat validasi form dan kirim data ke firebase
-
-//            val resultForm = Report(
-//                address = address,
-//                description = description,
-//                photoUri = capturedImage
-//            )
+            if (tipeBencana.isNotBlank() && jenisKerusakan.isNotBlank() && waktu.isNotBlank() && description.isNotBlank() && linkDonasi.isNotBlank() && capturedImage.isNotBlank() && capturedImage2.isNotBlank() && capturedImage3.isNotBlank()) {
+                //convert string to timestamp
+                //submit the data
+            }
         }
 
         Log.d(TAG, "initEditText: Isi data form\n$tipeBencana $jenisKerusakan $waktu $addressDetail $description $linkDonasi")
@@ -387,7 +386,26 @@ class DisasterReportFormActivity
 
     private fun submitReport(report: Report) {
         viewModel.submitReport(report)
+    }
 
+    private fun observeSubmitReportProgressStatus() {
+        viewModel.submitReportStatus.observe(this, { status ->
+            if (status != null) {
+                when (status) {
+                    is Resource.Failure -> {
+                        // show the failed notification to user
+                        // ask user to resubmit the data
+                    }
+                    is Resource.Loading -> {
+                        // show the loading bar
+                    }
+                    is Resource.Success -> {
+                        // show the success notification to user
+                        // back to maps activity
+                    }
+                }
+            }
+        })
     }
 
     companion object{

@@ -5,14 +5,13 @@ import com.google.firebase.Timestamp
 import java.util.*
 
 data class Report(
-    val id: Int,
     val timeStamp: Timestamp,
     val disaster: Disaster,
-//    val timeOfOccurrence: Calendar,
+    val typeOfDamage: String,
     val address: Address,
     val description: String,
     val feedback: Feedback,
-    val photoUri: String
+    val photoUri: List<String>
 ) {
 
 }
