@@ -186,7 +186,7 @@
                 tools:targetApi="m" />
 
             <ImageView
-                android:id="@+id/img_kerusakan_infrastruktur"
+                android:id="@+id/img_disaster"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="16dp"
