@@ -20,7 +20,6 @@ import com.capstone.ayoperbaiki.core.domain.model.Report
 import com.capstone.ayoperbaiki.databinding.ActivityMainBinding
 import com.capstone.ayoperbaiki.form.DisasterReportFormActivity
 import com.capstone.ayoperbaiki.utils.Disaster.mapDisasterIcon
-import com.capstone.ayoperbaiki.utils.Utils.EXTRA_ADDRESS
 import com.capstone.ayoperbaiki.utils.Utils.EXTRA_DATA_ADDRESS
 import com.capstone.ayoperbaiki.utils.Utils.STARTING_COORDINATE
 import com.capstone.ayoperbaiki.utils.Utils.hide

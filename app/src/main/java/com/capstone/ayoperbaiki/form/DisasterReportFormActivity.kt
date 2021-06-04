@@ -11,6 +11,7 @@ import android.provider.MediaStore
 import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -34,9 +35,11 @@ import com.capstone.ayoperbaiki.utils.Utils.EXTRA_DATA_ADDRESS
 import com.capstone.ayoperbaiki.utils.Utils.IMAGE_FILE_FORMAT
 import com.capstone.ayoperbaiki.utils.Utils.PERMISSION_REQUEST_CODE
 import com.capstone.ayoperbaiki.utils.Utils.REQUIRED_PERMISSION
+import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.*
 
+@AndroidEntryPoint
 class DisasterReportFormActivity
     : AppCompatActivity(), DatePickerFragment.DialogDateListener{
 
@@ -47,6 +50,7 @@ class DisasterReportFormActivity
     private lateinit var capturedImage: String
     private lateinit var capturedImage2: String
     private lateinit var capturedImage3: String
+    private val viewModel: ReportViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -379,6 +383,11 @@ class DisasterReportFormActivity
             "Valid" -> true
             else -> false
         }
+    }
+
+    private fun submitReport(report: Report) {
+        viewModel.submitReport(report)
+
     }
 
     companion object{
