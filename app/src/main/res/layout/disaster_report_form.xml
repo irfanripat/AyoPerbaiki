@@ -206,6 +206,32 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/input_layout_kategori_bencana_lainnya"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:visibility="gone"
+            android:layout_height="wrap_content"
+            app:boxStrokeColor="@color/ss_top"
+            app:counterEnabled="true"
+            android:layout_marginBottom="8dp"
+            app:counterMaxLength="25">
+
+            <AutoCompleteTextView
+                android:id="@+id/input_kategori_bencana_lainnya"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:hint="Tuliskan disini"
+                android:importantForAutofill="no"
+                android:inputType="text"
+                android:maxLength="25"
+                android:paddingVertical="10dp"
+                android:paddingHorizontal="14dp"
+                tools:ignore="LabelFor" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/input_layout_jenis_kerusakan"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
@@ -226,17 +252,18 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/actv_tipe_kerusakan_infrastruktur2"
+            android:id="@+id/input_layout_jenis_kerusakan_lainnya"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="gone"
             app:boxStrokeColor="@color/ss_top"
             app:counterEnabled="true"
+            android:layout_marginBottom="8dp"
             app:counterMaxLength="25">
 
             <AutoCompleteTextView
-                android:id="@+id/edt_tipe_kerusakan_infrastruktur2"
+                android:id="@+id/input_jenis_kerusakan_lainnya"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
@@ -244,8 +271,10 @@
                 android:importantForAutofill="no"
                 android:inputType="text"
                 android:maxLength="25"
-                android:padding="16dp"
+                android:paddingVertical="10dp"
+                android:paddingHorizontal="14dp"
                 tools:ignore="LabelFor" />
+
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -314,6 +343,7 @@
                 android:layout_height="wrap_content"/>
 
             <androidx.appcompat.widget.LinearLayoutCompat
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
@@ -347,6 +377,7 @@
             </androidx.appcompat.widget.LinearLayoutCompat>
 
             <androidx.appcompat.widget.LinearLayoutCompat
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="8dp"
@@ -377,6 +408,7 @@
             </androidx.appcompat.widget.LinearLayoutCompat>
 
             <androidx.appcompat.widget.LinearLayoutCompat
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="8dp"
@@ -407,19 +439,6 @@
             </androidx.appcompat.widget.LinearLayoutCompat>
 
         </androidx.appcompat.widget.LinearLayoutCompat>
-
-
-        <Button
-            android:id="@+id/btn_submit_form"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            android:paddingVertical="10dp"
-            android:textAllCaps="false"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:text="@string/buat_laporan" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 

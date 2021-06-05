@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.doOnTextChanged
+import androidx.recyclerview.widget.GridLayoutManager
 import com.capstone.ayoperbaiki.R
 import com.capstone.ayoperbaiki.core.data.Resource
 import com.capstone.ayoperbaiki.core.domain.model.Address
@@ -33,6 +34,7 @@ import java.io.IOException
 import org.tensorflow.lite.support.image.TensorImage
 import com.capstone.ayoperbaiki.ml.BlurImageModel
 import com.capstone.ayoperbaiki.utils.Disaster
+import com.capstone.ayoperbaiki.utils.GridPhotoAdapter
 import com.capstone.ayoperbaiki.utils.Utils.DATE_PICKER_TAG
 import com.capstone.ayoperbaiki.utils.Utils.EXTRA_DATA_ADDRESS
 import com.capstone.ayoperbaiki.utils.Utils.IMAGE_FILE_FORMAT
@@ -54,6 +56,7 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
     private lateinit var capturedImage2: String
     private lateinit var capturedImage3: String
     private val viewModel: ReportViewModel by viewModels()
+    private lateinit var gridPhotoAdapter: GridPhotoAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,11 +65,12 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
         setContentView(binding.root)
         address = intent.extras?.getParcelable<Address>(EXTRA_DATA_ADDRESS) as Address
         showDataAddress()
+        showRecyclerGrid()
         checkCameraPermission()
         initForm()
 
         binding.btnBack.setOnClickListener(this)
-        bindingForm.btnSubmitForm.setOnClickListener(this)
+//        bindingForm.btnSubmitForm.setOnClickListener(this)
     }
 
     private fun checkCameraPermission() {
@@ -86,7 +90,19 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
             bindingForm.inputLatitude.setText(String.format("${latitude.roundOffDecimal()}°"))
             bindingForm.inputLongitude.setText(String.format("${longitude.roundOffDecimal()}°"))
         }
+    }
 
+    private fun showRecyclerGrid() {
+        bindingForm.rvImage.layoutManager = GridLayoutManager(this, 3)
+        gridPhotoAdapter = GridPhotoAdapter()
+        gridPhotoAdapter.setData(emptyList())
+        gridPhotoAdapter.onButtonClick = {
+            startCamera(CAPTURE_IMAGE_FROM_CAMERA_REQUEST_CODE)
+        }
+        gridPhotoAdapter.onItemClick = {
+            gridPhotoAdapter.deleteDataAtIndex(it)
+        }
+        bindingForm.rvImage.adapter = gridPhotoAdapter
     }
 
     override fun onResume() {
@@ -300,6 +316,30 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when(requestCode){
+            CAPTURE_IMAGE_FROM_CAMERA_REQUEST_CODE -> {
+                if(resultCode == RESULT_OK){
+                    //Untuk mengambil hasil gambar full berdasarkan path
+                    val imgFile = File(outputImagePath)
+                    if (imgFile.exists()) {
+
+                        //validasi gambar blue atau tidak
+                        val bitmap = BitmapFactory.decodeFile(outputImagePath)
+                        if(validateImage(bitmap)){
+                            val resultPhoto = Uri.fromFile(imgFile)
+                            capturedImage = resultPhoto.toString()
+                            gridPhotoAdapter.addData(capturedImage)
+                        } else {
+                            Toast.makeText(this@DisasterReportFormActivity, "Gambar tampak blur. Mohon ambil gambar kembali!", Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        Toast.makeText(applicationContext, "Error: Image not captured", Toast.LENGTH_LONG).show()
+                    }
+
+                } else {
+                    bindingForm.imgKerusakanInfrastruktur.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.placeholder_image, null))
+                    Toast.makeText(applicationContext, "Error while saving picture.", Toast.LENGTH_LONG).show()
+                }
+            }
             CAPTURE_IMAGE_REQUEST_CODE -> {
                 if(resultCode == RESULT_OK){
                     //Untuk mengambil hasil gambar full berdasarkan path
@@ -427,12 +467,13 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
         private const val CAPTURE_IMAGE_REQUEST_CODE = 101
         private const val CAPTURE_IMAGE2_REQUEST_CODE = 102
         private const val CAPTURE_IMAGE3_REQUEST_CODE = 103
+        private const val CAPTURE_IMAGE_FROM_CAMERA_REQUEST_CODE = 100
     }
 
     override fun onClick(view: View?) {
         when(view) {
             binding.btnBack -> confirmBack()
-            bindingForm.btnSubmitForm -> Toast.makeText(this, "submit", Toast.LENGTH_SHORT).show()
+//            bindingForm.btnSubmitForm -> Toast.makeText(this, "submit", Toast.LENGTH_SHORT).show()
         }
     }
 

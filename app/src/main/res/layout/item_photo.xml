@@ -9,13 +9,12 @@
 
     app:cardCornerRadius="5dp">
 
-    <ImageButton
-        android:id="@+id/btn_add_photo"
+    <ImageView
+        android:id="@+id/img_disaster"
         android:layout_width="150dp"
         android:layout_height="150dp"
-        android:src="@drawable/ic_take_a_picture"
-        android:background="@android:color/transparent"
-        android:scaleType="fitXY"
+        android:src="@drawable/sample_image"
+        android:scaleType="center"
         android:padding="12dp"
         tools:ignore="ContentDescription" />
 
