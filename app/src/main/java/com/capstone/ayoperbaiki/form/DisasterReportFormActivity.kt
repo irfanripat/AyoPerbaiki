@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
+import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -31,6 +32,7 @@ import java.io.File
 import java.io.IOException
 import org.tensorflow.lite.support.image.TensorImage
 import com.capstone.ayoperbaiki.ml.BlurImageModel
+import com.capstone.ayoperbaiki.utils.Disaster
 import com.capstone.ayoperbaiki.utils.Utils.DATE_PICKER_TAG
 import com.capstone.ayoperbaiki.utils.Utils.EXTRA_DATA_ADDRESS
 import com.capstone.ayoperbaiki.utils.Utils.IMAGE_FILE_FORMAT
@@ -42,8 +44,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @AndroidEntryPoint
-class DisasterReportFormActivity
-    : AppCompatActivity(), DatePickerFragment.DialogDateListener{
+class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.DialogDateListener, View.OnClickListener{
 
     private lateinit var binding: ActivityDisasterReportFormBinding
     private lateinit var bindingForm: DisasterReportFormBinding
@@ -59,33 +60,38 @@ class DisasterReportFormActivity
         binding = ActivityDisasterReportFormBinding.inflate(layoutInflater)
         bindingForm = binding.detailContent
         setContentView(binding.root)
+        address = intent.extras?.getParcelable<Address>(EXTRA_DATA_ADDRESS) as Address
+        checkCameraPermission()
+        initForm()
 
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.apply {
-            title = "Disaster Report Form"
-            elevation = 4f
-        }
+        binding.btnBack.setOnClickListener(this)
+        binding.btnSubmit.setOnClickListener(this)
+    }
 
+    private fun checkCameraPermission() {
         if(isPermissionGranted()){
             initCamera()
             Toast.makeText(this, "Permission already granted", Toast.LENGTH_SHORT).show()
         } else {
             ActivityCompat.requestPermissions(this, REQUIRED_PERMISSION, PERMISSION_REQUEST_CODE)
         }
-
-        val data = intent.extras
-        if(data != null){
-            address = data.getParcelable<Address>(EXTRA_DATA_ADDRESS) as Address
-        }
-
-        initForm()
     }
 
     override fun onResume() {
         super.onResume()
-        val disasterList = resources.getStringArray(R.array.list_disaster)
+        //Init dropdown kategori bencana
+        val disasterList = Disaster.generateDisaster() as ArrayList<String>
+        disasterList.add("Lainnya")
+        Log.d(TAG, "onResume: list disaster $disasterList")
         val arrayAdapter = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, disasterList)
         bindingForm.edtTipeBencana.setAdapter(arrayAdapter)
+
+        //Init dropdown tipe kerusakan infrastruktur
+        val kerusakanList = Disaster.generateKerusakanInfrastruktur2() as ArrayList<String>
+        kerusakanList.add("Lainnya")
+        Log.d(TAG, "onResume: list disaster $kerusakanList")
+        val arrayAdapter2 = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, kerusakanList)
+        bindingForm.edtTipeKerusakanInfrastruktur.setAdapter(arrayAdapter2)
     }
 
     private fun initForm() {
@@ -413,5 +419,20 @@ class DisasterReportFormActivity
         private const val CAPTURE_IMAGE_REQUEST_CODE = 101
         private const val CAPTURE_IMAGE2_REQUEST_CODE = 102
         private const val CAPTURE_IMAGE3_REQUEST_CODE = 103
+    }
+
+    override fun onClick(view: View?) {
+        when(view) {
+            binding.btnBack -> confirmBack()
+            binding.btnSubmit -> Toast.makeText(this, "submit", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun confirmBack() {
+        //show some alert dialog
+        //if confirm yes, will back to maps activity
+        //if no will stay in form activity and keep the data
+        finish()
+        overridePendingTransition(0, R.anim.bottom_to_top)
     }
 }

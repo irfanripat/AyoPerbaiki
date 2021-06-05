@@ -14,6 +14,9 @@
 
     <string name="no_return_address">Tidak ada data untuk koordinat ini</string>
     <string name="search_view_hint">Ketik lokasi, tempat...</string>
+    <string name="form_title">Formulir Kerusakan Infrastruktur</string>
+    <string name="back">Back</string>
+    <string name="submit_form">Submit Form</string>
 
 
     <string-array name="list_disaster">

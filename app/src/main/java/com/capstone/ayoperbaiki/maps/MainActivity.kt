@@ -271,7 +271,9 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
     private fun addNewReport(address: Address) {
         val intent = Intent(this, DisasterReportFormActivity::class.java)
         intent.putExtra(EXTRA_DATA_ADDRESS, address)
+
         startActivity(intent)
+        overridePendingTransition(R.anim.top_to_bottom, 0)
     }
 
     private fun getAddressFromLocation(latLng: LatLng) {
