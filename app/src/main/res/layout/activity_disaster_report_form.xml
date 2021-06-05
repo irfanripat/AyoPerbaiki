@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@android:color/white"
     tools:context=".form.DisasterReportFormActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -16,8 +16,20 @@
             android:layout_height="match_parent"
             android:orientation="horizontal">
 
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:textColor="@color/white"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="0dp"
+                android:fontFamily="@font/open_sans_bold"
+                android:text="@string/form_title"
+                android:textSize="18sp" />
+
             <RelativeLayout
-                android:layout_width="50dp"
+                android:layout_width="55dp"
                 android:layout_height="match_parent">
 
                 <ImageButton
@@ -28,32 +40,6 @@
                     android:layout_height="match_parent"
                     android:src="@drawable/ic_close"
                     android:contentDescription="@string/back" />
-
-            </RelativeLayout>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:textColor="@color/white"
-                android:textAlignment="center"
-                android:gravity="center"
-                android:fontFamily="@font/open_sans_bold"
-                android:text="@string/form_title"
-                android:textSize="16.5sp" />
-
-            <RelativeLayout
-                android:layout_width="50dp"
-                android:layout_height="match_parent">
-
-                <ImageButton
-                    android:id="@+id/btn_submit"
-                    android:layout_width="match_parent"
-                    android:layout_margin="10dp"
-                    android:background="?selectableItemBackgroundBorderless"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/ic_check"
-                    android:contentDescription="@string/submit_form"/>
 
             </RelativeLayout>
 

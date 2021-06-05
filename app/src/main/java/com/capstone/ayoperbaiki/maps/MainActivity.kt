@@ -23,6 +23,7 @@ import com.capstone.ayoperbaiki.utils.Disaster.mapDisasterIcon
 import com.capstone.ayoperbaiki.utils.Utils.EXTRA_DATA_ADDRESS
 import com.capstone.ayoperbaiki.utils.Utils.STARTING_COORDINATE
 import com.capstone.ayoperbaiki.utils.Utils.hide
+import com.capstone.ayoperbaiki.utils.Utils.roundOffDecimal
 import com.capstone.ayoperbaiki.utils.Utils.show
 import com.google.android.gms.common.api.Status
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -255,12 +256,6 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
         bottomSheetBehavior.state = STATE_EXPANDED
     }
 
-    private fun Double.roundOffDecimal(): Double {
-        val df = DecimalFormat("#.####", DecimalFormatSymbols(Locale.ENGLISH))
-        df.roundingMode = RoundingMode.CEILING
-        return df.format(this).toDouble()
-    }
-
     private fun getDateTime(timestamp: Timestamp): String {
         val milliseconds = timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000
         val sdf = SimpleDateFormat("dd MMMM yyyy, HH:mm", Locale.getDefault())
@@ -273,7 +268,7 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
         intent.putExtra(EXTRA_DATA_ADDRESS, address)
 
         startActivity(intent)
-        overridePendingTransition(R.anim.top_to_bottom, 0)
+        overridePendingTransition(R.anim.top_to_bottom, R.anim.null_animation)
     }
 
     private fun getAddressFromLocation(latLng: LatLng) {

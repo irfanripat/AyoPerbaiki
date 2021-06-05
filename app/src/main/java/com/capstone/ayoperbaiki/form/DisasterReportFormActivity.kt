@@ -38,7 +38,7 @@ import com.capstone.ayoperbaiki.utils.Utils.EXTRA_DATA_ADDRESS
 import com.capstone.ayoperbaiki.utils.Utils.IMAGE_FILE_FORMAT
 import com.capstone.ayoperbaiki.utils.Utils.PERMISSION_REQUEST_CODE
 import com.capstone.ayoperbaiki.utils.Utils.REQUIRED_PERMISSION
-import com.google.firebase.Timestamp
+import com.capstone.ayoperbaiki.utils.Utils.roundOffDecimal
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.*
@@ -61,11 +61,12 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
         bindingForm = binding.detailContent
         setContentView(binding.root)
         address = intent.extras?.getParcelable<Address>(EXTRA_DATA_ADDRESS) as Address
+        showDataAddress()
         checkCameraPermission()
         initForm()
 
         binding.btnBack.setOnClickListener(this)
-        binding.btnSubmit.setOnClickListener(this)
+        bindingForm.btnSubmitForm.setOnClickListener(this)
     }
 
     private fun checkCameraPermission() {
@@ -75,6 +76,17 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
         } else {
             ActivityCompat.requestPermissions(this, REQUIRED_PERMISSION, PERMISSION_REQUEST_CODE)
         }
+    }
+
+    private fun showDataAddress() {
+        with(address) {
+            bindingForm.inputAlamat.setText(address)
+            bindingForm.inputKota.setText(city)
+            bindingForm.inputProvinsi.setText(state)
+            bindingForm.inputLatitude.setText(String.format("${latitude.roundOffDecimal()}°"))
+            bindingForm.inputLongitude.setText(String.format("${longitude.roundOffDecimal()}°"))
+        }
+
     }
 
     override fun onResume() {
@@ -91,128 +103,124 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
         kerusakanList.add("Lainnya")
         Log.d(TAG, "onResume: list disaster $kerusakanList")
         val arrayAdapter2 = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, kerusakanList)
-        bindingForm.edtTipeKerusakanInfrastruktur.setAdapter(arrayAdapter2)
+        bindingForm.inputJenisKerusakan.setAdapter(arrayAdapter2)
     }
 
     private fun initForm() {
-        var tipeBencana: String = bindingForm.edtTipeBencana.text.toString()
-        var jenisKerusakan: String = bindingForm.edtTipeKerusakanInfrastruktur.text.toString()
-        var waktu: String = bindingForm.edtWaktuBencana.text.toString()
-        var description: String = bindingForm.edtKeteranganBencana.text.toString()
-        var linkDonasi: String = bindingForm.edtLinkDonasi.text.toString()
-        val addressDetail = "${address.city}, ${address.country}, Kode Pos ${address.postalCode} (Latitude: ${address.latitude}, Longitude ${address.longitude})"
-
-        bindingForm.edtTipeBencana.setOnItemClickListener { parent, _, position, _ ->
-            val item = parent.getItemAtPosition(position).toString()
-            when {
-                item == "Lainnya" -> {
-                    bindingForm.actvTipeBencana2.visible()
-                    bindingForm.edtTipeBencana2.doOnTextChanged { text, _, _, _ ->
-                        if(text != null) when {
-                            text.isEmpty() -> {
-                                bindingForm.actvTipeBencana2.apply {
-                                    error = getString(R.string.required_text_field)
-                                    isHelperTextEnabled = true
-                                    isErrorEnabled = true
-                                    errorIconDrawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_error, null)
-                                }
-                            }
-                            text.isNotEmpty() -> {
-                                bindingForm.actvTipeBencana2.apply {
-                                    isErrorEnabled = false
-                                    isHelperTextEnabled = false
-                                }
-                            }
-                        }
-                        tipeBencana = bindingForm.edtTipeBencana2.text.toString().trim()
-                    }
-                }
-                item != "Lainnya" -> {
-                    bindingForm.actvTipeBencana2.gone()
-                    tipeBencana = bindingForm.edtTipeBencana.text.toString().trim()
-                }
-            }
-        }
-
-        bindingForm.edtTipeKerusakanInfrastruktur.setOnItemClickListener { parent, _, position, _ ->
-            val item = parent.getItemAtPosition(position).toString()
-            when {
-                item == "Lainnya" -> {
-                    bindingForm.actvTipeKerusakanInfrastruktur2.visible()
-                    bindingForm.edtTipeKerusakanInfrastruktur2.doOnTextChanged { text, _, _, _ ->
-                        if(text != null) when {
-                            text.isEmpty() -> {
-                                bindingForm.actvTipeKerusakanInfrastruktur2.apply {
-                                    error = getString(R.string.required_text_field)
-                                    isHelperTextEnabled = true
-                                    isErrorEnabled = true
-                                    errorIconDrawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_error, null)
-                                }
-                            }
-                            text.isNotEmpty() -> {
-                                bindingForm.actvTipeKerusakanInfrastruktur2.apply {
-                                    isErrorEnabled = false
-                                    isHelperTextEnabled = false
-                                }
-                            }
-                        }
-                        jenisKerusakan = bindingForm.edtTipeKerusakanInfrastruktur2.text.toString().trim()
-                    }
-                }
-                item != "Lainnya" -> {
-                    bindingForm.actvTipeKerusakanInfrastruktur2.gone()
-                    jenisKerusakan = bindingForm.edtTipeKerusakanInfrastruktur2.text.toString().trim()
-                }
-            }
-        }
-
-        bindingForm.actvWaktuBencana.setEndIconOnClickListener {
-            Toast.makeText(this, "TestEndIcon", Toast.LENGTH_SHORT).show()
-            val datePickerFragment = DatePickerFragment()
-            datePickerFragment.show(supportFragmentManager, DATE_PICKER_TAG)
-
-            waktu = bindingForm.edtWaktuBencana.text.toString().trim()
-        }
-
-        bindingForm.edtLokasiBencana.apply {
-            setText(addressDetail)
-        }
-        
-        bindingForm.edtKeteranganBencana.doOnTextChanged { text, _, _, _ ->
-            if(text != null) when {
-                text.isEmpty() -> {
-                    bindingForm.actvKeteranganBencana.apply {
-                        isHelperTextEnabled = true
-                        isErrorEnabled = true
-                        error = getString(R.string.required_text_field)
-                        errorIconDrawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_error, null)
-                    }
-                }
-                text.isNotEmpty() -> {
-                    bindingForm.actvKeteranganBencana.apply {
-                        isErrorEnabled = false
-                        isHelperTextEnabled = false
-                    }
-
-                    description = bindingForm.edtKeteranganBencana.text.toString().trim()
-                }
-            }
-        }
-
-        bindingForm.edtLinkDonasi.doOnTextChanged { text, _, _, _ ->
-            if(text != null) {
-                linkDonasi = bindingForm.edtLinkDonasi.text.toString().trim()
-            }
-        }
-
-        bindingForm.btnSubmitForm.setOnClickListener {
-            if (tipeBencana.isNotBlank() && jenisKerusakan.isNotBlank() && waktu.isNotBlank() && description.isNotBlank() && linkDonasi.isNotBlank() && capturedImage.isNotBlank() && capturedImage2.isNotBlank() && capturedImage3.isNotBlank()) {
-                //convert string to timestamp
-                //submit the data
-            }
-        }
-
-        Log.d(TAG, "initEditText: Isi data form\n$tipeBencana $jenisKerusakan $waktu $addressDetail $description $linkDonasi")
+//        var tipeBencana: String = bindingForm.edtTipeBencana.text.toString()
+//        var jenisKerusakan: String = bindingForm.edtTipeKerusakanInfrastruktur.text.toString()
+//        var waktu: String = bindingForm.edtWaktuBencana.text.toString()
+//        var description: String = bindingForm.edtKeteranganBencana.text.toString()
+//        var linkDonasi: String = bindingForm.edtLinkDonasi.text.toString()
+//        val addressDetail = "${address.city}, ${address.country}, Kode Pos ${address.postalCode} (Latitude: ${address.latitude}, Longitude ${address.longitude})"
+//
+//        bindingForm.edtTipeBencana.setOnItemClickListener { parent, _, position, _ ->
+//            val item = parent.getItemAtPosition(position).toString()
+//            when {
+//                item == "Lainnya" -> {
+//                    bindingForm.actvTipeBencana2.visible()
+//                    bindingForm.edtTipeBencana2.doOnTextChanged { text, _, _, _ ->
+//                        if(text != null) when {
+//                            text.isEmpty() -> {
+//                                bindingForm.actvTipeBencana2.apply {
+//                                    error = getString(R.string.required_text_field)
+//                                    isHelperTextEnabled = true
+//                                    isErrorEnabled = true
+//                                    errorIconDrawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_error, null)
+//                                }
+//                            }
+//                            text.isNotEmpty() -> {
+//                                bindingForm.actvTipeBencana2.apply {
+//                                    isErrorEnabled = false
+//                                    isHelperTextEnabled = false
+//                                }
+//                            }
+//                        }
+//                        tipeBencana = bindingForm.edtTipeBencana2.text.toString().trim()
+//                    }
+//                }
+//                item != "Lainnya" -> {
+//                    bindingForm.actvTipeBencana2.gone()
+//                    tipeBencana = bindingForm.edtTipeBencana.text.toString().trim()
+//                }
+//            }
+//        }
+//
+//        bindingForm.edtTipeKerusakanInfrastruktur.setOnItemClickListener { parent, _, position, _ ->
+//            val item = parent.getItemAtPosition(position).toString()
+//            when {
+//                item == "Lainnya" -> {
+//                    bindingForm.actvTipeKerusakanInfrastruktur2.visible()
+//                    bindingForm.edtTipeKerusakanInfrastruktur2.doOnTextChanged { text, _, _, _ ->
+//                        if(text != null) when {
+//                            text.isEmpty() -> {
+//                                bindingForm.actvTipeKerusakanInfrastruktur2.apply {
+//                                    error = getString(R.string.required_text_field)
+//                                    isHelperTextEnabled = true
+//                                    isErrorEnabled = true
+//                                    errorIconDrawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_error, null)
+//                                }
+//                            }
+//                            text.isNotEmpty() -> {
+//                                bindingForm.actvTipeKerusakanInfrastruktur2.apply {
+//                                    isErrorEnabled = false
+//                                    isHelperTextEnabled = false
+//                                }
+//                            }
+//                        }
+//                        jenisKerusakan = bindingForm.edtTipeKerusakanInfrastruktur2.text.toString().trim()
+//                    }
+//                }
+//                item != "Lainnya" -> {
+//                    bindingForm.actvTipeKerusakanInfrastruktur2.gone()
+//                    jenisKerusakan = bindingForm.edtTipeKerusakanInfrastruktur2.text.toString().trim()
+//                }
+//            }
+//        }
+//
+//        bindingForm.actvWaktuBencana.setEndIconOnClickListener {
+//            Toast.makeText(this, "TestEndIcon", Toast.LENGTH_SHORT).show()
+//            val datePickerFragment = DatePickerFragment()
+//            datePickerFragment.show(supportFragmentManager, DATE_PICKER_TAG)
+//
+//            waktu = bindingForm.edtWaktuBencana.text.toString().trim()
+//        }
+//
+//        bindingForm.edtKeteranganBencana.doOnTextChanged { text, _, _, _ ->
+//            if(text != null) when {
+//                text.isEmpty() -> {
+//                    bindingForm.actvKeteranganBencana.apply {
+//                        isHelperTextEnabled = true
+//                        isErrorEnabled = true
+//                        error = getString(R.string.required_text_field)
+//                        errorIconDrawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_error, null)
+//                    }
+//                }
+//                text.isNotEmpty() -> {
+//                    bindingForm.actvKeteranganBencana.apply {
+//                        isErrorEnabled = false
+//                        isHelperTextEnabled = false
+//                    }
+//
+//                    description = bindingForm.edtKeteranganBencana.text.toString().trim()
+//                }
+//            }
+//        }
+//
+//        bindingForm.edtLinkDonasi.doOnTextChanged { text, _, _, _ ->
+//            if(text != null) {
+//                linkDonasi = bindingForm.edtLinkDonasi.text.toString().trim()
+//            }
+//        }
+//
+//        bindingForm.btnSubmitForm.setOnClickListener {
+//            if (tipeBencana.isNotBlank() && jenisKerusakan.isNotBlank() && waktu.isNotBlank() && description.isNotBlank() && linkDonasi.isNotBlank() && capturedImage.isNotBlank() && capturedImage2.isNotBlank() && capturedImage3.isNotBlank()) {
+//                //convert string to timestamp
+//                //submit the data
+//            }
+//        }
+//
+//        Log.d(TAG, "initEditText: Isi data form\n$tipeBencana $jenisKerusakan $waktu $addressDetail $description $linkDonasi")
     }
 
     private fun initCamera() {
@@ -372,7 +380,7 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
         val dateFormat = SimpleDateFormat("EEEE, d MMMM yyyy HH:mm:ss", Locale.getDefault())
 
         //Set text dari textview once
-        bindingForm.edtWaktuBencana.setText(dateFormat.format(calendar.time))
+//        bindingForm.edtWaktuBencana.setText(dateFormat.format(calendar.time))
     }
 
     private fun validateImage(bitmap: Bitmap?) : Boolean {
@@ -424,7 +432,7 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
     override fun onClick(view: View?) {
         when(view) {
             binding.btnBack -> confirmBack()
-            binding.btnSubmit -> Toast.makeText(this, "submit", Toast.LENGTH_SHORT).show()
+            bindingForm.btnSubmitForm -> Toast.makeText(this, "submit", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -433,6 +441,6 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
         //if confirm yes, will back to maps activity
         //if no will stay in form activity and keep the data
         finish()
-        overridePendingTransition(0, R.anim.bottom_to_top)
+        overridePendingTransition(R.anim.null_animation, R.anim.bottom_to_top)
     }
 }

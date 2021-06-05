@@ -8,6 +8,10 @@ import com.capstone.ayoperbaiki.core.domain.model.Report
 import com.capstone.ayoperbaiki.form.DisasterReportFormActivity
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.Timestamp
+import java.math.RoundingMode
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.util.*
 import kotlin.random.Random
 
 object Utils {
@@ -27,5 +31,9 @@ object Utils {
 
     val STARTING_COORDINATE = LatLng(-2.44565,117.8888)
 
-
+    fun Double.roundOffDecimal(): Double {
+        val df = DecimalFormat("#.####", DecimalFormatSymbols(Locale.ENGLISH))
+        df.roundingMode = RoundingMode.CEILING
+        return df.format(this).toDouble()
+    }
 }

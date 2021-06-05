@@ -17,6 +17,21 @@
     <string name="form_title">Formulir Kerusakan Infrastruktur</string>
     <string name="back">Back</string>
     <string name="submit_form">Submit Form</string>
+    <string name="form_caution">Mohon mengisi form kerusakan bencana berikut ini dengan data yang valid dan benar.</string>
+    <string name="lokasi_bencana">Lokasi Bencana</string>
+    <string name="garis_lintang">Garis Lintang</string>
+    <string name="garis_bujur">Garis Bujur</string>
+    <string name="text_warning_lokasi_bencana">Data lokasi bencana tidak dapat diubah pada halaman ini. Jika ada ingin melakukan perubahan anda dapat kembali ke halaman maps untuk memmilih lokasi yang baru.</string>
+    <string name="buat_laporan">Buat Laporan</string>
+    <string name="alamat">Alamat</string>
+    <string name="kota_kabupaten">Kota/Kabupaten</string>
+    <string name="provinsi">Provinsi</string>
+    <string name="star">**</string>
+    <string name="detail_kerusakan_bencana">Detail Kerusakan Bencana</string>
+    <string name="kategori_bencana">Kategori Bencana</string>
+    <string name="tipe_kerusakan_infrastruktur">Tipe Kerusakan Infrastruktur</string>
+    <string name="waktu_kejadian">Waktu Kejadian</string>
+    <string name="tambahkan_bukti_gambar_kerusakan">Tambahkan bukti gambar kerusakan:</string>
 
 
     <string-array name="list_disaster">
