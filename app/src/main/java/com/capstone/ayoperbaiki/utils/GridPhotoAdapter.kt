@@ -9,6 +9,8 @@ import com.bumptech.glide.Glide
 import com.capstone.ayoperbaiki.R
 import com.capstone.ayoperbaiki.databinding.ItemAddPhotoBinding
 import com.capstone.ayoperbaiki.databinding.ItemPhotoBinding
+import com.capstone.ayoperbaiki.utils.Utils.LIMIT_PICTURE
+import com.capstone.ayoperbaiki.utils.Utils.hide
 
 class GridPhotoAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -50,6 +52,9 @@ class GridPhotoAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     override fun getItemCount(): Int {
+        if (listData.size + 1 > LIMIT_PICTURE) {
+            return LIMIT_PICTURE
+        }
         return listData.size + 1
     }
 
@@ -79,7 +84,6 @@ class GridPhotoAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         private val binding = ItemAddPhotoBinding.bind(itemView)
         fun bind() {
             binding.btnAddPhoto.setOnClickListener {
-                //masuk ke kamera
                 onButtonClick?.invoke()
             }
         }

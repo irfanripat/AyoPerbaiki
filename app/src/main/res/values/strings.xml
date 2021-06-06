@@ -31,6 +31,9 @@
     <string name="kategori_bencana">Kategori Bencana</string>
     <string name="tipe_kerusakan_infrastruktur">Tipe Kerusakan Infrastruktur</string>
     <string name="tambahkan_bukti_gambar_kerusakan">Tambahkan bukti gambar kerusakan:</string>
+    <string name="image_not_captured">Gambar tidak tertangkap</string>
+    <string name="failed_save_image">Error saat menyimpan gambar.</string>
+    <string name="permission_denies_msg">Anda tidak mengizinkan aplikasi untuk mengakses kamera</string>
 
 
     <string-array name="list_disaster">

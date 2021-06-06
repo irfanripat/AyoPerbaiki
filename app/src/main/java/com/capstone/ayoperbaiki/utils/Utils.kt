@@ -31,6 +31,8 @@ object Utils {
 
     val STARTING_COORDINATE = LatLng(-2.44565,117.8888)
 
+    const val LIMIT_PICTURE = 3
+
     fun Double.roundOffDecimal(): Double {
         val df = DecimalFormat("#.####", DecimalFormatSymbols(Locale.ENGLISH))
         df.roundingMode = RoundingMode.CEILING

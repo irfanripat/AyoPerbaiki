@@ -26,8 +26,6 @@ import com.capstone.ayoperbaiki.core.domain.model.Address
 import com.capstone.ayoperbaiki.core.domain.model.Report
 import com.capstone.ayoperbaiki.databinding.ActivityDisasterReportFormBinding
 import com.capstone.ayoperbaiki.databinding.DisasterReportFormBinding
-import com.capstone.ayoperbaiki.utils.gone
-import com.capstone.ayoperbaiki.utils.visible
 import com.dicoding.picodiploma.myalarmmanager.utils.DatePickerFragment
 import java.io.File
 import java.io.IOException
@@ -35,16 +33,18 @@ import org.tensorflow.lite.support.image.TensorImage
 import com.capstone.ayoperbaiki.ml.BlurImageModel
 import com.capstone.ayoperbaiki.utils.Disaster
 import com.capstone.ayoperbaiki.utils.GridPhotoAdapter
-import com.capstone.ayoperbaiki.utils.Utils.DATE_PICKER_TAG
 import com.capstone.ayoperbaiki.utils.Utils.EXTRA_DATA_ADDRESS
 import com.capstone.ayoperbaiki.utils.Utils.IMAGE_FILE_FORMAT
 import com.capstone.ayoperbaiki.utils.Utils.PERMISSION_REQUEST_CODE
 import com.capstone.ayoperbaiki.utils.Utils.REQUIRED_PERMISSION
+import com.capstone.ayoperbaiki.utils.Utils.hide
 import com.capstone.ayoperbaiki.utils.Utils.roundOffDecimal
+import com.capstone.ayoperbaiki.utils.Utils.show
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.*
 
+@Suppress("DEPRECATION")
 @AndroidEntryPoint
 class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.DialogDateListener, View.OnClickListener{
 
@@ -52,9 +52,6 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
     private lateinit var bindingForm: DisasterReportFormBinding
     private lateinit var outputImagePath: String
     private lateinit var address: Address
-    private lateinit var capturedImage: String
-    private lateinit var capturedImage2: String
-    private lateinit var capturedImage3: String
     private val viewModel: ReportViewModel by viewModels()
     private lateinit var gridPhotoAdapter: GridPhotoAdapter
 
@@ -64,19 +61,19 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
         bindingForm = binding.detailContent
         setContentView(binding.root)
         address = intent.extras?.getParcelable<Address>(EXTRA_DATA_ADDRESS) as Address
+        initFormInputAdapter()
         showDataAddress()
         showRecyclerGrid()
         checkCameraPermission()
-        initForm()
+
+        val 
 
         binding.btnBack.setOnClickListener(this)
-//        bindingForm.btnSubmitForm.setOnClickListener(this)
     }
 
     private fun checkCameraPermission() {
         if(isPermissionGranted()){
-            initCamera()
-            Toast.makeText(this, "Permission already granted", Toast.LENGTH_SHORT).show()
+            initAdapterListener()
         } else {
             ActivityCompat.requestPermissions(this, REQUIRED_PERMISSION, PERMISSION_REQUEST_CODE)
         }
@@ -92,173 +89,40 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
         }
     }
 
+    private fun initFormInputAdapter() {
+        val disasterList = Disaster.generateDisaster() as ArrayList<String>
+        val arrayAdapter = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, disasterList)
+        bindingForm.inputKategoriBencana.setAdapter(arrayAdapter)
+
+        val typeOfDamageList = Disaster.generateListTypeOfDamage() as ArrayList<String>
+        val arrayAdapter2 = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, typeOfDamageList)
+        bindingForm.inputJenisKerusakan.setAdapter(arrayAdapter2)
+    }
+
     private fun showRecyclerGrid() {
         bindingForm.rvImage.layoutManager = GridLayoutManager(this, 3)
         gridPhotoAdapter = GridPhotoAdapter()
         gridPhotoAdapter.setData(emptyList())
+        initAdapterListener()
+        bindingForm.rvImage.adapter = gridPhotoAdapter
+    }
+
+    private fun initAdapterListener() {
         gridPhotoAdapter.onButtonClick = {
-            startCamera(CAPTURE_IMAGE_FROM_CAMERA_REQUEST_CODE)
+            startCamera()
         }
         gridPhotoAdapter.onItemClick = {
             gridPhotoAdapter.deleteDataAtIndex(it)
         }
-        bindingForm.rvImage.adapter = gridPhotoAdapter
     }
-
-    override fun onResume() {
-        super.onResume()
-        //Init dropdown kategori bencana
-        val disasterList = Disaster.generateDisaster() as ArrayList<String>
-        disasterList.add("Lainnya")
-        Log.d(TAG, "onResume: list disaster $disasterList")
-        val arrayAdapter = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, disasterList)
-        bindingForm.edtTipeBencana.setAdapter(arrayAdapter)
-
-        //Init dropdown tipe kerusakan infrastruktur
-        val kerusakanList = Disaster.generateKerusakanInfrastruktur2() as ArrayList<String>
-        kerusakanList.add("Lainnya")
-        Log.d(TAG, "onResume: list disaster $kerusakanList")
-        val arrayAdapter2 = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, kerusakanList)
-        bindingForm.inputJenisKerusakan.setAdapter(arrayAdapter2)
-    }
-
-    private fun initForm() {
-//        var tipeBencana: String = bindingForm.edtTipeBencana.text.toString()
-//        var jenisKerusakan: String = bindingForm.edtTipeKerusakanInfrastruktur.text.toString()
-//        var waktu: String = bindingForm.edtWaktuBencana.text.toString()
-//        var description: String = bindingForm.edtKeteranganBencana.text.toString()
-//        var linkDonasi: String = bindingForm.edtLinkDonasi.text.toString()
-//        val addressDetail = "${address.city}, ${address.country}, Kode Pos ${address.postalCode} (Latitude: ${address.latitude}, Longitude ${address.longitude})"
-//
-//        bindingForm.edtTipeBencana.setOnItemClickListener { parent, _, position, _ ->
-//            val item = parent.getItemAtPosition(position).toString()
-//            when {
-//                item == "Lainnya" -> {
-//                    bindingForm.actvTipeBencana2.visible()
-//                    bindingForm.edtTipeBencana2.doOnTextChanged { text, _, _, _ ->
-//                        if(text != null) when {
-//                            text.isEmpty() -> {
-//                                bindingForm.actvTipeBencana2.apply {
-//                                    error = getString(R.string.required_text_field)
-//                                    isHelperTextEnabled = true
-//                                    isErrorEnabled = true
-//                                    errorIconDrawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_error, null)
-//                                }
-//                            }
-//                            text.isNotEmpty() -> {
-//                                bindingForm.actvTipeBencana2.apply {
-//                                    isErrorEnabled = false
-//                                    isHelperTextEnabled = false
-//                                }
-//                            }
-//                        }
-//                        tipeBencana = bindingForm.edtTipeBencana2.text.toString().trim()
-//                    }
-//                }
-//                item != "Lainnya" -> {
-//                    bindingForm.actvTipeBencana2.gone()
-//                    tipeBencana = bindingForm.edtTipeBencana.text.toString().trim()
-//                }
-//            }
-//        }
-//
-//        bindingForm.edtTipeKerusakanInfrastruktur.setOnItemClickListener { parent, _, position, _ ->
-//            val item = parent.getItemAtPosition(position).toString()
-//            when {
-//                item == "Lainnya" -> {
-//                    bindingForm.actvTipeKerusakanInfrastruktur2.visible()
-//                    bindingForm.edtTipeKerusakanInfrastruktur2.doOnTextChanged { text, _, _, _ ->
-//                        if(text != null) when {
-//                            text.isEmpty() -> {
-//                                bindingForm.actvTipeKerusakanInfrastruktur2.apply {
-//                                    error = getString(R.string.required_text_field)
-//                                    isHelperTextEnabled = true
-//                                    isErrorEnabled = true
-//                                    errorIconDrawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_error, null)
-//                                }
-//                            }
-//                            text.isNotEmpty() -> {
-//                                bindingForm.actvTipeKerusakanInfrastruktur2.apply {
-//                                    isErrorEnabled = false
-//                                    isHelperTextEnabled = false
-//                                }
-//                            }
-//                        }
-//                        jenisKerusakan = bindingForm.edtTipeKerusakanInfrastruktur2.text.toString().trim()
-//                    }
-//                }
-//                item != "Lainnya" -> {
-//                    bindingForm.actvTipeKerusakanInfrastruktur2.gone()
-//                    jenisKerusakan = bindingForm.edtTipeKerusakanInfrastruktur2.text.toString().trim()
-//                }
-//            }
-//        }
-//
-//        bindingForm.actvWaktuBencana.setEndIconOnClickListener {
-//            Toast.makeText(this, "TestEndIcon", Toast.LENGTH_SHORT).show()
-//            val datePickerFragment = DatePickerFragment()
-//            datePickerFragment.show(supportFragmentManager, DATE_PICKER_TAG)
-//
-//            waktu = bindingForm.edtWaktuBencana.text.toString().trim()
-//        }
-//
-//        bindingForm.edtKeteranganBencana.doOnTextChanged { text, _, _, _ ->
-//            if(text != null) when {
-//                text.isEmpty() -> {
-//                    bindingForm.actvKeteranganBencana.apply {
-//                        isHelperTextEnabled = true
-//                        isErrorEnabled = true
-//                        error = getString(R.string.required_text_field)
-//                        errorIconDrawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_error, null)
-//                    }
-//                }
-//                text.isNotEmpty() -> {
-//                    bindingForm.actvKeteranganBencana.apply {
-//                        isErrorEnabled = false
-//                        isHelperTextEnabled = false
-//                    }
-//
-//                    description = bindingForm.edtKeteranganBencana.text.toString().trim()
-//                }
-//            }
-//        }
-//
-//        bindingForm.edtLinkDonasi.doOnTextChanged { text, _, _, _ ->
-//            if(text != null) {
-//                linkDonasi = bindingForm.edtLinkDonasi.text.toString().trim()
-//            }
-//        }
-//
-//        bindingForm.btnSubmitForm.setOnClickListener {
-//            if (tipeBencana.isNotBlank() && jenisKerusakan.isNotBlank() && waktu.isNotBlank() && description.isNotBlank() && linkDonasi.isNotBlank() && capturedImage.isNotBlank() && capturedImage2.isNotBlank() && capturedImage3.isNotBlank()) {
-//                //convert string to timestamp
-//                //submit the data
-//            }
-//        }
-//
-//        Log.d(TAG, "initEditText: Isi data form\n$tipeBencana $jenisKerusakan $waktu $addressDetail $description $linkDonasi")
-    }
-
-    private fun initCamera() {
-        bindingForm.btnOpenCamera.setOnClickListener {
-            startCamera(CAPTURE_IMAGE_REQUEST_CODE)
-        }
-        bindingForm.btnOpenCamera2.setOnClickListener {
-            startCamera(CAPTURE_IMAGE2_REQUEST_CODE)
-        }
-        bindingForm.btnOpenCamera3.setOnClickListener {
-            startCamera(CAPTURE_IMAGE3_REQUEST_CODE)
-        }
-    }
-
 
     private fun isPermissionGranted(): Boolean {
         return REQUIRED_PERMISSION.all {
             ContextCompat.checkSelfPermission(baseContext, it) != PackageManager.PERMISSION_GRANTED
         }
     }
-
-    private fun startCamera(requestCode: Int) {
+    
+    private fun startCamera() {
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
             takePictureIntent.resolveActivity(packageManager)?.also {
 
@@ -278,7 +142,7 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
                         it
                     )
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-                    startActivityForResult(takePictureIntent, requestCode)
+                    startActivityForResult(takePictureIntent, CAPTURE_IMAGE_FROM_CAMERA_REQUEST_CODE)
                 }
             }
         }
@@ -299,17 +163,12 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
         if(isPermissionGranted()){
-            initCamera()
+            initAdapterListener()
         } else {
-            Toast.makeText(this, "Permission camera has been denied by user", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.permission_denies_msg), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -318,94 +177,20 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
         when(requestCode){
             CAPTURE_IMAGE_FROM_CAMERA_REQUEST_CODE -> {
                 if(resultCode == RESULT_OK){
-                    //Untuk mengambil hasil gambar full berdasarkan path
                     val imgFile = File(outputImagePath)
                     if (imgFile.exists()) {
-
-                        //validasi gambar blue atau tidak
                         val bitmap = BitmapFactory.decodeFile(outputImagePath)
                         if(validateImage(bitmap)){
                             val resultPhoto = Uri.fromFile(imgFile)
-                            capturedImage = resultPhoto.toString()
-                            gridPhotoAdapter.addData(capturedImage)
+                            gridPhotoAdapter.addData(resultPhoto.toString())
                         } else {
                             Toast.makeText(this@DisasterReportFormActivity, "Gambar tampak blur. Mohon ambil gambar kembali!", Toast.LENGTH_SHORT).show()
                         }
                     } else {
-                        Toast.makeText(applicationContext, "Error: Image not captured", Toast.LENGTH_LONG).show()
-                    }
-
-                } else {
-                    bindingForm.imgKerusakanInfrastruktur.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.placeholder_image, null))
-                    Toast.makeText(applicationContext, "Error while saving picture.", Toast.LENGTH_LONG).show()
-                }
-            }
-            CAPTURE_IMAGE_REQUEST_CODE -> {
-                if(resultCode == RESULT_OK){
-                    //Untuk mengambil hasil gambar full berdasarkan path
-                    val imgFile = File(outputImagePath)
-                    if (imgFile.exists()) {
-
-                        //validasi gambar blue atau tidak
-                        val bitmap = BitmapFactory.decodeFile(outputImagePath)
-                        if(validateImage(bitmap)){
-                            val resultPhoto = Uri.fromFile(imgFile)
-                            capturedImage = resultPhoto.toString()
-                            bindingForm.imgKerusakanInfrastruktur.setImageURI(resultPhoto)
-                        } else {
-                            Toast.makeText(this@DisasterReportFormActivity, "Gambar tampak blur. Mohon ambil gambar kembali!", Toast.LENGTH_SHORT).show()
-                        }
-                    } else {
-                        Toast.makeText(applicationContext, "Error: Image not captured", Toast.LENGTH_LONG).show()
-                    }
-
-                } else {
-                    bindingForm.imgKerusakanInfrastruktur.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.placeholder_image, null))
-                    Toast.makeText(applicationContext, "Error while saving picture.", Toast.LENGTH_LONG).show()
-                }
-            }
-            CAPTURE_IMAGE2_REQUEST_CODE -> {
-                if(resultCode == RESULT_OK){
-                    //Untuk mengambil hasil gambar full berdasarkan path
-                    val imgFile = File(outputImagePath)
-                    if (imgFile.exists()) {
-                        //validasi gambar blue atau tidak
-                        val bitmap = BitmapFactory.decodeFile(outputImagePath)
-                        if(validateImage(bitmap)){
-                            val resultPhoto = Uri.fromFile(imgFile)
-                            capturedImage2 = resultPhoto.toString()
-                            bindingForm.imgKerusakanInfrastruktur2.setImageURI(resultPhoto)
-                        } else {
-                            Toast.makeText(this@DisasterReportFormActivity, "Gambar tampak blur. Mohon ambil gambar kembali!", Toast.LENGTH_SHORT).show()
-                        }
-                    } else {
-                        Toast.makeText(applicationContext, "Error: Image not captured", Toast.LENGTH_LONG).show()
+                        Toast.makeText(applicationContext, getString(R.string.image_not_captured), Toast.LENGTH_LONG).show()
                     }
                 } else {
-                    bindingForm.imgKerusakanInfrastruktur2.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.placeholder_image, null))
-                }
-            }
-            CAPTURE_IMAGE3_REQUEST_CODE -> {
-                if(resultCode == RESULT_OK){
-                    //Untuk mengambil hasil gambar full berdasarkan path
-                    val imgFile = File(outputImagePath)
-                    if (imgFile.exists()) {
-                        //validasi gambar blue atau tidak
-                        val bitmap = BitmapFactory.decodeFile(outputImagePath)
-                        if(validateImage(bitmap)){
-                            val resultPhoto = Uri.fromFile(imgFile)
-                            capturedImage3 = resultPhoto.toString()
-                            bindingForm.imgKerusakanInfrastruktur3.setImageURI(resultPhoto)
-                        } else {
-                            Toast.makeText(this@DisasterReportFormActivity, "Gambar tampak blur. Mohon ambil gambar kembali!", Toast.LENGTH_SHORT).show()
-                        }
-                    } else {
-                        Toast.makeText(applicationContext, "Error: Image not captured", Toast.LENGTH_LONG).show()
-                    }
-
-                } else {
-                    bindingForm.imgKerusakanInfrastruktur3.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.placeholder_image, null))
-                    Toast.makeText(applicationContext, "Error while saving picture.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(applicationContext, getString(R.string.failed_save_image), Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -420,7 +205,7 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
         val dateFormat = SimpleDateFormat("EEEE, d MMMM yyyy HH:mm:ss", Locale.getDefault())
 
         //Set text dari textview once
-//        bindingForm.edtWaktuBencana.setText(dateFormat.format(calendar.time))
+//        bindingForm.edtWaktuBe ncana.setText(dateFormat.format(calendar.time))
     }
 
     private fun validateImage(bitmap: Bitmap?) : Boolean {
@@ -464,24 +249,124 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
 
     companion object{
         private val TAG = DisasterReportFormActivity::class.java.simpleName
-        private const val CAPTURE_IMAGE_REQUEST_CODE = 101
-        private const val CAPTURE_IMAGE2_REQUEST_CODE = 102
-        private const val CAPTURE_IMAGE3_REQUEST_CODE = 103
         private const val CAPTURE_IMAGE_FROM_CAMERA_REQUEST_CODE = 100
     }
 
     override fun onClick(view: View?) {
         when(view) {
             binding.btnBack -> confirmBack()
-//            bindingForm.btnSubmitForm -> Toast.makeText(this, "submit", Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun confirmBack() {
-        //show some alert dialog
-        //if confirm yes, will back to maps activity
-        //if no will stay in form activity and keep the data
         finish()
         overridePendingTransition(R.anim.null_animation, R.anim.bottom_to_top)
+    }
+
+    private fun processToSubmitData() {
+        var tipeBencana: String = bindingForm.inputKategoriBencana.text.toString()
+        var jenisKerusakan: String = bindingForm.inputJenisKerusakan.text.toString()
+        var waktu: String = bindingForm.inputWaktu.text.toString()
+        var description: String = bindingForm.inputKeterangan.text.toString()
+
+        bindingForm.inputKategoriBencana.setOnItemClickListener { parent, _, position, _ ->
+            val item = parent.getItemAtPosition(position).toString()
+            when {
+                item == "Lainnya" -> {
+                    bindingForm.inputLayoutKategoriBencanaLainnya.show()
+                    bindingForm.inputKategoriBencanaLainnya.doOnTextChanged { text, _, _, _ ->
+                        if(text != null) when {
+                            text.isEmpty() -> {
+                                bindingForm.inputLayoutKategoriBencanaLainnya.apply {
+                                    error = getString(R.string.required_text_field)
+                                    isHelperTextEnabled = true
+                                    isErrorEnabled = true
+                                    errorIconDrawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_error, null)
+                                }
+                            }
+                            text.isNotEmpty() -> {
+                                bindingForm.inputLayoutKategoriBencanaLainnya.apply {
+                                    isErrorEnabled = false
+                                    isHelperTextEnabled = false
+                                }
+                            }
+                        }
+                        tipeBencana = bindingForm.inputKategoriBencanaLainnya.text.toString().trim()
+                    }
+                }
+                item != "Lainnya" -> {
+                    bindingForm.inputLayoutKategoriBencanaLainnya.hide()
+                    tipeBencana = bindingForm.inputKategoriBencana.text.toString().trim()
+                }
+            }
+        }
+
+        bindingForm.inputJenisKerusakan.setOnItemClickListener { parent, _, position, _ ->
+            val item = parent.getItemAtPosition(position).toString()
+            when {
+                item == "Lainnya" -> {
+                    bindingForm.inputLayoutJenisKerusakanLainnya.show()
+                    bindingForm.inputJenisKerusakanLainnya.doOnTextChanged { text, _, _, _ ->
+                        if(text != null) when {
+                            text.isEmpty() -> {
+                                bindingForm.inputLayoutJenisKerusakanLainnya.apply {
+                                    error = getString(R.string.required_text_field)
+                                    isHelperTextEnabled = true
+                                    isErrorEnabled = true
+                                    errorIconDrawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_error, null)
+                                }
+                            }
+                            text.isNotEmpty() -> {
+                                bindingForm.inputLayoutJenisKerusakanLainnya.apply {
+                                    isErrorEnabled = false
+                                    isHelperTextEnabled = false
+                                }
+                            }
+                        }
+                        jenisKerusakan = bindingForm.inputJenisKerusakanLainnya.text.toString().trim()
+                    }
+                }
+                item != "Lainnya" -> {
+                    bindingForm.inputLayoutJenisKerusakanLainnya.hide()
+                    jenisKerusakan = bindingForm.inputJenisKerusakanLainnya.text.toString().trim()
+                }
+            }
+        }
+
+//        bindingForm.actvWaktuBencana.setEndIconOnClickListener {
+//            Toast.makeText(this, "TestEndIcon", Toast.LENGTH_SHORT).show()
+//            val datePickerFragment = DatePickerFragment()
+//            datePickerFragment.show(supportFragmentManager, DATE_PICKER_TAG)
+//
+//            waktu = bindingForm.edtWaktuBencana.text.toString().trim()
+//        }
+//
+        bindingForm.inputKeterangan.doOnTextChanged { text, _, _, _ ->
+            if(text != null) when {
+                text.isEmpty() -> {
+                    bindingForm.inputLayoutKeterangan.apply {
+                        isHelperTextEnabled = true
+                        isErrorEnabled = true
+                        error = getString(R.string.required_text_field)
+                        errorIconDrawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_error, null)
+                    }
+                }
+                text.isNotEmpty() -> {
+                    bindingForm.inputLayoutKeterangan.apply {
+                        isErrorEnabled = false
+                        isHelperTextEnabled = false
+                    }
+
+                    description = bindingForm.inputKeterangan.text.toString().trim()
+                }
+            }
+        }
+
+//        bindingForm.btnSubmitForm.setOnClickListener {
+//            if (tipeBencana.isNotBlank() && jenisKerusakan.isNotBlank() && waktu.isNotBlank() && description.isNotBlank() && linkDonasi.isNotBlank() && capturedImage.isNotBlank() && capturedImage2.isNotBlank() && capturedImage3.isNotBlank()) {
+//                //convert string to timestamp
+//                //submit the data
+//            }
+//        }
     }
 }
