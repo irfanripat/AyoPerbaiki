@@ -2,6 +2,7 @@ package com.capstone.ayoperbaiki.core.data.source.firebase.response
 
 class AddressResponse (
     val address: String = "",
+    val district: String = "",
     val city: String = "",
     val state: String = "",
     val country: String = "",

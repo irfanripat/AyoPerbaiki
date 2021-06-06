@@ -19,7 +19,7 @@ import com.capstone.ayoperbaiki.core.domain.model.Address
 import com.capstone.ayoperbaiki.core.domain.model.Report
 import com.capstone.ayoperbaiki.databinding.ActivityMainBinding
 import com.capstone.ayoperbaiki.form.DisasterReportFormActivity
-import com.capstone.ayoperbaiki.utils.Disaster.mapDisasterIcon
+import com.capstone.ayoperbaiki.utils.DisasterData.mapDisasterIcon
 import com.capstone.ayoperbaiki.utils.Utils.EXTRA_DATA_ADDRESS
 import com.capstone.ayoperbaiki.utils.Utils.STARTING_COORDINATE
 import com.capstone.ayoperbaiki.utils.Utils.getDateTime
@@ -38,16 +38,11 @@ import com.google.android.libraries.places.widget.listener.PlaceSelectionListene
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
-import com.google.firebase.Timestamp
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.IOException
-import java.math.RoundingMode
-import java.text.DecimalFormat
-import java.text.DecimalFormatSymbols
-import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -72,6 +67,14 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
         binding.btnAdd.setOnClickListener {
             addNewReport(selectedAddress!!)
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (selectedMarker != null) {
+            selectedMarker?.remove()
+        }
+        viewModel.getAllReport()
     }
 
     private fun initPlaceAutoComplete() {
@@ -238,12 +241,12 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
 
         with(report) {
             tvDisasterName.text = disaster.disasterName
-            tvDisasterAddress.text = String.format("${address.city}, ${address.state}")
+            tvDisasterAddress.text = String.format("${address.address}, ${address.city.replace("Kabupaten ", "").replace("Kota ", "")}")
             tvDisasterLatLng.text = String.format("${address.latitude.roundOffDecimal()}°, ${address.longitude.roundOffDecimal()}°")
             tvDisasterDesc.text = description
             tvDisasterTime.text = getDateTime(timeStamp)
             Glide.with(this@MainActivity)
-                    .load(photoUri)
+                    .load(photoUri[0])
                     .placeholder(R.drawable.default_placeholder)
                     .into(imgDisaster)
 
@@ -277,14 +280,13 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
                         Toast.makeText(this@MainActivity, result[0].subLocality, Toast.LENGTH_SHORT).show()
                         with(result[0]) {
                             selectedAddress = Address(
-                                    subLocality ?: "Unknown",
-                                    subAdminArea ?: "Unknown",
-                                    adminArea ?: "Unknown",
-                                    countryName ?: "Unknown",
-                                    postalCode ?: "Unknown",
-                                    locality ?: "Unknown",
-                                    latitude,
-                                    longitude
+                                subLocality ?: "Unknown",
+                                locality ?: "Unknown",
+                                subAdminArea ?: "Unknown",
+                                adminArea ?: "Unknown",
+                                countryName ?: "Unknown",
+                                latitude,
+                                longitude
                             )
                             binding.btnAdd.show()
                         }

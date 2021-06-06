@@ -46,4 +46,8 @@ object Utils {
         val netDate = Date(milliseconds)
         return sdf.format(netDate).toString()
     }
+
+    fun <K, V> getKey(hashMap: Map<K, V>, target: V): K {
+        return hashMap.filter { target == it.value }.keys.first()
+    }
 }

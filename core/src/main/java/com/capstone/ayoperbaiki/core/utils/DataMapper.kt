@@ -13,7 +13,7 @@ object DataMapper {
         input.map {
             val report = Report(
                     disaster = Disaster(it.disaster.id, it.disaster.disasterName),
-                    address = Address(it.address.address, it.address.city, it.address.state, it.address.country, it.address.latitude, it.address.longitude),
+                    address = Address(it.address.address, it.address.district, it.address.city, it.address.state, it.address.country, it.address.latitude, it.address.longitude),
                     timeStamp = it.timeStamp,
                     description = it.description,
                     feedback = Feedback(it.feedback.status, it.feedback.description),

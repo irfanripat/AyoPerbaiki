@@ -2,7 +2,7 @@ package com.capstone.ayoperbaiki.utils
 
 import com.capstone.ayoperbaiki.R
 
-object Disaster {
+object DisasterData {
 
     val mapDisaster : Map<Int, String> = mapOf(
             1 to "Banjir",

@@ -26,16 +26,23 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.capstone.ayoperbaiki.R
 import com.capstone.ayoperbaiki.core.data.Resource
 import com.capstone.ayoperbaiki.core.domain.model.Address
+import com.capstone.ayoperbaiki.core.domain.model.Disaster
+import com.capstone.ayoperbaiki.core.domain.model.Feedback
+import com.capstone.ayoperbaiki.core.domain.model.Report
 import com.capstone.ayoperbaiki.databinding.ActivityDisasterReportFormBinding
 import com.capstone.ayoperbaiki.databinding.DisasterReportFormBinding
 import com.capstone.ayoperbaiki.ml.BlurImageModel
-import com.capstone.ayoperbaiki.utils.Disaster
+import com.capstone.ayoperbaiki.utils.DisasterData.generateDisaster
+import com.capstone.ayoperbaiki.utils.DisasterData.generateListTypeOfDamage
+import com.capstone.ayoperbaiki.utils.DisasterData.mapDisaster
+import com.capstone.ayoperbaiki.utils.DisasterData.mapTypeOfDamage
 import com.capstone.ayoperbaiki.utils.GridPhotoAdapter
 import com.capstone.ayoperbaiki.utils.Utils.EXTRA_DATA_ADDRESS
 import com.capstone.ayoperbaiki.utils.Utils.IMAGE_FILE_FORMAT
 import com.capstone.ayoperbaiki.utils.Utils.PERMISSION_REQUEST_CODE
 import com.capstone.ayoperbaiki.utils.Utils.REQUIRED_PERMISSION
 import com.capstone.ayoperbaiki.utils.Utils.getDateTime
+import com.capstone.ayoperbaiki.utils.Utils.getKey
 import com.capstone.ayoperbaiki.utils.Utils.hide
 import com.capstone.ayoperbaiki.utils.Utils.roundOffDecimal
 import com.capstone.ayoperbaiki.utils.Utils.show
@@ -92,7 +99,7 @@ class DisasterReportFormActivity : AppCompatActivity(), View.OnClickListener{
         val disasterTypeStream = RxTextView.textChanges(bindingForm.inputKategoriBencana)
             .skipInitialValue()
             .map { disasterType ->
-                Disaster.mapDisaster.getValue(7) == disasterType.toString()
+                mapDisaster.getValue(7) == disasterType.toString()
             }
         disasterTypeStream.subscribe {
             showCustomDisasterType(it)
@@ -101,7 +108,7 @@ class DisasterReportFormActivity : AppCompatActivity(), View.OnClickListener{
         val damageTypeStream = RxTextView.textChanges(bindingForm.inputJenisKerusakan)
             .skipInitialValue()
             .map { damageType ->
-                Disaster.mapTypeOfDamage.getValue(13) == damageType.toString()
+                mapTypeOfDamage.getValue(13) == damageType.toString()
             }
         damageTypeStream.subscribe{
             showCustomDamageType(it)
@@ -245,7 +252,7 @@ class DisasterReportFormActivity : AppCompatActivity(), View.OnClickListener{
 
     private fun showDataAddress() {
         with(address) {
-            bindingForm.inputAlamat.setText(address)
+            bindingForm.inputAlamat.setText(String.format("$address, $district"))
             bindingForm.inputKota.setText(city)
             bindingForm.inputProvinsi.setText(state)
             bindingForm.inputLatitude.setText(String.format("${latitude.roundOffDecimal()}°"))
@@ -254,7 +261,7 @@ class DisasterReportFormActivity : AppCompatActivity(), View.OnClickListener{
     }
 
     private fun initFormInputAdapter() {
-        val disasterList = Disaster.generateDisaster() as ArrayList<String>
+        val disasterList = generateDisaster() as ArrayList<String>
         val arrayAdapter = ArrayAdapter(
             this,
             R.layout.support_simple_spinner_dropdown_item,
@@ -262,7 +269,7 @@ class DisasterReportFormActivity : AppCompatActivity(), View.OnClickListener{
         )
         bindingForm.inputKategoriBencana.setAdapter(arrayAdapter)
 
-        val typeOfDamageList = Disaster.generateListTypeOfDamage() as ArrayList<String>
+        val typeOfDamageList = generateListTypeOfDamage() as ArrayList<String>
         val arrayAdapter2 = ArrayAdapter(
             this,
             R.layout.support_simple_spinner_dropdown_item,
@@ -419,14 +426,24 @@ class DisasterReportFormActivity : AppCompatActivity(), View.OnClickListener{
             val disasterAddress = address
             val disasterDescription = inputKeterangan.text.toString().trim()
 
-            selectedDisasterType = if (Disaster.mapDisaster.getValue(7) == disasterType) customDisasterType else disasterType
-            selectedDamageType = if (Disaster.mapTypeOfDamage.getValue(13) == damageType) customDamageType else damageType
+            selectedDisasterType = if (mapDisaster.getValue(7) == disasterType) customDisasterType else disasterType
+            selectedDamageType = if (mapTypeOfDamage.getValue(13) == damageType) customDamageType else damageType
 
             Toast.makeText(this@DisasterReportFormActivity, "$selectedDisasterType \n$selectedDamageType \n$disasterTime $disasterAddress $disasterDescription", Toast.LENGTH_SHORT).show()
 
             //iterate upload image to storage one by one
             //save the return to a variable
             //make report object
+            val report = Report(
+                Disaster(getKey(mapDisaster, selectedDisasterType), selectedDisasterType),
+                address,
+                disasterTime!!,
+                selectedDamageType,
+                disasterDescription,
+                Feedback(false, ""),
+                listOf("https://firebasestorage.googleapis.com/v0/b/ayoperbaiki.appspot.com/o/064242000_1577883977-IMG-20200101-0053.jpg?alt=media&token=30239432-4463-4673-ac67-53eacf3d69f8")
+            )
+            viewModel.submitReport(report)
             //upload to firebase storage
         }
     }
@@ -443,6 +460,8 @@ class DisasterReportFormActivity : AppCompatActivity(), View.OnClickListener{
                         // show the loading bar
                     }
                     is Resource.Success -> {
+                        finish()
+                        overridePendingTransition(R.anim.null_animation, R.anim.bottom_to_top)
                         // show the success notification to user
                         // back to maps activity
                     }
