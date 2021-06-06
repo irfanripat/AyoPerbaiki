@@ -73,6 +73,7 @@
             android:layout_height="wrap_content"
             android:paddingVertical="12dp"
             android:layout_margin="16dp"
+            android:enabled="false"
             android:text="@string/buat_laporan"
             android:textAllCaps="false"
             android:layout_alignParentBottom="true"/>

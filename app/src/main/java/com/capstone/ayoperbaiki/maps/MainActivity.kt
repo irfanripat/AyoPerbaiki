@@ -22,6 +22,7 @@ import com.capstone.ayoperbaiki.form.DisasterReportFormActivity
 import com.capstone.ayoperbaiki.utils.Disaster.mapDisasterIcon
 import com.capstone.ayoperbaiki.utils.Utils.EXTRA_DATA_ADDRESS
 import com.capstone.ayoperbaiki.utils.Utils.STARTING_COORDINATE
+import com.capstone.ayoperbaiki.utils.Utils.getDateTime
 import com.capstone.ayoperbaiki.utils.Utils.hide
 import com.capstone.ayoperbaiki.utils.Utils.roundOffDecimal
 import com.capstone.ayoperbaiki.utils.Utils.show
@@ -256,12 +257,7 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
         bottomSheetBehavior.state = STATE_EXPANDED
     }
 
-    private fun getDateTime(timestamp: Timestamp): String {
-        val milliseconds = timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000
-        val sdf = SimpleDateFormat("dd MMMM yyyy, HH:mm", Locale.getDefault())
-        val netDate = Date(milliseconds)
-        return sdf.format(netDate).toString()
-    }
+
 
     private fun addNewReport(address: Address) {
         val intent = Intent(this, DisasterReportFormActivity::class.java)

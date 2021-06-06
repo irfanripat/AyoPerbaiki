@@ -293,6 +293,9 @@
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
                 android:importantForAutofill="no"
+                android:clickable="false"
+                android:focusable="false"
+                android:cursorVisible="false"
                 android:hint="@string/waktu_kejadian"
                 android:inputType="none"
                 android:paddingVertical="10dp"
@@ -337,106 +340,21 @@
                 android:textSize="14sp"
                 android:text="@string/tambahkan_bukti_gambar_kerusakan" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_image"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:visibility="gone"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/input_layout_gambar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:orientation="vertical"
-                >
-                <Button
-                    android:id="@+id/btn_open_camera"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="12sp"
-                    android:layout_marginTop="4dp"
-                    android:layout_gravity="center"
-                    android:textAllCaps="false"
-                    android:drawableLeft="@drawable/ic_camera"
-                    android:drawableTint="@color/white"
-                    android:drawablePadding="8dp"
-                    android:text="Ambil\nGambar"
-                    tools:targetApi="m" />
+                android:layout_marginBottom="24dp"
+                app:boxStrokeColor="@color/ss_top"
+                app:hintEnabled="true">
 
-                <ImageView
-                    android:id="@+id/img_kerusakan_infrastruktur"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingHorizontal="8dp"
-                    android:requiresFadingEdge="vertical"
-                    android:adjustViewBounds="true"
-                    android:contentDescription="Gambar Kerusakan Infrastruktur"
-                    android:src="@drawable/placeholder_image"
-                    tools:src="@tools:sample/backgrounds/scenic"
-                     />
-            </androidx.appcompat.widget.LinearLayoutCompat>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
 
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:visibility="gone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="8dp"
-                android:orientation="vertical"
-                >
-                <Button
-                    android:id="@+id/btn_open_camera2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:layout_gravity="center"
-                    android:textAllCaps="false"
-                    android:drawableLeft="@drawable/ic_camera"
-                    android:drawableTint="@color/white"
-                    android:text="Ambil\nGambar"
-                    tools:targetApi="m" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-                <ImageView
-                    android:id="@+id/img_kerusakan_infrastruktur2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingHorizontal="8dp"
-                    android:requiresFadingEdge="vertical"
-                    android:adjustViewBounds="true"
-                    android:contentDescription="Gambar Kerusakan Infrastruktur"
-                    android:src="@drawable/placeholder_image"
-                    tools:src="@tools:sample/backgrounds/scenic" />
-            </androidx.appcompat.widget.LinearLayoutCompat>
-
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:visibility="gone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="8dp"
-                android:orientation="vertical"
-                >
-                <Button
-                    android:id="@+id/btn_open_camera3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:layout_gravity="center"
-                    android:textAllCaps="false"
-                    android:drawableLeft="@drawable/ic_camera"
-                    android:drawableTint="@color/white"
-                    android:text="Ambil\nGambar"
-                    tools:targetApi="m" />
-
-                <ImageView
-                    android:id="@+id/img_kerusakan_infrastruktur3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingHorizontal="8dp"
-                    android:requiresFadingEdge="vertical"
-                    android:adjustViewBounds="true"
-                    android:contentDescription="Gambar Kerusakan Infrastruktur"
-                    android:src="@drawable/placeholder_image"
-                    tools:src="@tools:sample/backgrounds/scenic" />
-            </androidx.appcompat.widget.LinearLayoutCompat>
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 

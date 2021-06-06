@@ -4,7 +4,7 @@ import com.capstone.ayoperbaiki.R
 
 object Disaster {
 
-    val mapDisaster = mapOf(
+    val mapDisaster : Map<Int, String> = mapOf(
             1 to "Banjir",
             2 to "Kebakaran Hutan",
             3 to "Gempa Bumi",

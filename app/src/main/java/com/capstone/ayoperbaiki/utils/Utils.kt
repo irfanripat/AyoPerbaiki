@@ -11,6 +11,7 @@ import com.google.firebase.Timestamp
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.random.Random
 
@@ -37,5 +38,12 @@ object Utils {
         val df = DecimalFormat("#.####", DecimalFormatSymbols(Locale.ENGLISH))
         df.roundingMode = RoundingMode.CEILING
         return df.format(this).toDouble()
+    }
+
+    fun getDateTime(timestamp: Timestamp): String {
+        val milliseconds = timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000
+        val sdf = SimpleDateFormat("dd MMMM yyyy, HH:mm", Locale.getDefault())
+        val netDate = Date(milliseconds)
+        return sdf.format(netDate).toString()
     }
 }
