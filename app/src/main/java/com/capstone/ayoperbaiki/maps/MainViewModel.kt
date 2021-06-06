@@ -19,7 +19,9 @@ import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor(private val reportUseCase: ReportUseCase) : ViewModel() {
+class MainViewModel @Inject constructor(
+    private val reportUseCase: ReportUseCase
+) : ViewModel() {
 
     private val _listReport = MutableLiveData<Resource<List<Report>>>()
     private val _selectedLatLang = MutableLiveData<LatLng?>()

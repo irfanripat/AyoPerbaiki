@@ -20,7 +20,6 @@ import com.capstone.ayoperbaiki.core.domain.model.Report
 import com.capstone.ayoperbaiki.databinding.ActivityMainBinding
 import com.capstone.ayoperbaiki.form.DisasterReportFormActivity
 import com.capstone.ayoperbaiki.utils.Disaster.mapDisasterIcon
-import com.capstone.ayoperbaiki.utils.Utils.EXTRA_ADDRESS
 import com.capstone.ayoperbaiki.utils.Utils.EXTRA_DATA_ADDRESS
 import com.capstone.ayoperbaiki.utils.Utils.STARTING_COORDINATE
 import com.capstone.ayoperbaiki.utils.Utils.hide
@@ -49,14 +48,13 @@ import java.text.DecimalFormatSymbols
 import java.text.SimpleDateFormat
 import java.util.*
 
-
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
 
-    private lateinit var binding : ActivityMainBinding
-    private val viewModel : MainViewModel by viewModels()
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
     private lateinit var mapFragment: SupportMapFragment
+    private lateinit var binding : ActivityMainBinding
+    private val viewModel : MainViewModel by viewModels()
     private var selectedMarker: Marker? = null
     private var selectedAddress: Address? = null
 
@@ -80,17 +78,32 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
 
         val autocompleteFragment = supportFragmentManager.findFragmentById(R.id.autocomplete_fragment) as AutocompleteSupportFragment?
 
-        autocompleteFragment!!.setPlaceFields(listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG))
+        // Replace dari kode yg dibawah
+        autocompleteFragment?.apply {
+            setPlaceFields(listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG))
 
-        autocompleteFragment.setHint(getString(R.string.search_view_hint))
+            setHint(getString(R.string.search_view_hint))
 
-        autocompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
-            override fun onPlaceSelected(place: Place) {
-                place.latLng?.let { setCurrentSelectedLatLang(it) }
-            }
+            setOnPlaceSelectedListener(object : PlaceSelectionListener {
+                override fun onPlaceSelected(place: Place) {
+                    place.latLng?.let { setCurrentSelectedLatLang(it) }
+                }
 
-            override fun onError(status: Status) {}
-        })
+                override fun onError(status: Status) {}
+            })
+        }
+
+//        autocompleteFragment!!.setPlaceFields(listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG))
+//
+//        autocompleteFragment.setHint(getString(R.string.search_view_hint))
+//
+//        autocompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
+//            override fun onPlaceSelected(place: Place) {
+//                place.latLng?.let { setCurrentSelectedLatLang(it) }
+//            }
+//
+//            override fun onError(status: Status) {}
+//        })
     }
 
     private fun initMapFragment() {

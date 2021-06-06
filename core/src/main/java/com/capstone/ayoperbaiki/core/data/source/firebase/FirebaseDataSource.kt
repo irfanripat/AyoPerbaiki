@@ -1,7 +1,7 @@
 package com.capstone.ayoperbaiki.core.data.source.firebase
 
-
 import android.net.Uri
+import android.util.Log
 import com.capstone.ayoperbaiki.core.data.Resource
 import com.capstone.ayoperbaiki.core.data.source.firebase.response.ReportResponse
 import com.capstone.ayoperbaiki.core.domain.model.Report
@@ -47,7 +47,9 @@ class FirebaseDataSource @Inject constructor(
         }
 
     fun uploadImageWithUri(uri : Uri, block: ((Resource<Uri>, Int) -> Unit)?) {
+        Log.d("DisasterReportForm", "uploadImage: string 1 di fire $uri")
         val photoRef = storage.child(REF_NAME).child(uri.lastPathSegment!!)
+
         photoRef.putFile(uri)
             .addOnProgressListener { taskSnapshot ->
                 val percentComplete = if (taskSnapshot.totalByteCount > 0) {
@@ -55,7 +57,8 @@ class FirebaseDataSource @Inject constructor(
                 } else 0
 
                 block?.invoke(Resource.Loading(), percentComplete)
-            }.continueWithTask { task ->
+            }
+            .continueWithTask { task ->
                 // Forward any exceptions
                 if (!task.isSuccessful) {
                     throw task.exception!!
@@ -63,8 +66,12 @@ class FirebaseDataSource @Inject constructor(
                 // Request the public download URL
                 photoRef.downloadUrl
             }
-            .addOnSuccessListener { block?.invoke(Resource.Success(it), 100) }
-            .addOnFailureListener { block?.invoke(Resource.Failure(it), 0) }
+            .addOnSuccessListener {
+                block?.invoke(Resource.Success(it), 100)
+            }
+            .addOnFailureListener {
+                block?.invoke(Resource.Failure(it), 0)
+            }
     }
 
 }

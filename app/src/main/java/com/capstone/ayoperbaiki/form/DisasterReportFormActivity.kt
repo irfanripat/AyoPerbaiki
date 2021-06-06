@@ -11,6 +11,7 @@ import android.provider.MediaStore
 import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -19,24 +20,28 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.doOnTextChanged
 import com.capstone.ayoperbaiki.R
 import com.capstone.ayoperbaiki.core.domain.model.Address
-import com.capstone.ayoperbaiki.core.domain.model.Report
+import com.capstone.ayoperbaiki.core.domain.model.Disaster
+import com.capstone.ayoperbaiki.core.domain.model.Feedback
 import com.capstone.ayoperbaiki.databinding.ActivityDisasterReportFormBinding
 import com.capstone.ayoperbaiki.databinding.DisasterReportFormBinding
-import com.capstone.ayoperbaiki.utils.gone
-import com.capstone.ayoperbaiki.utils.visible
-import com.dicoding.picodiploma.myalarmmanager.utils.DatePickerFragment
-import java.io.File
-import java.io.IOException
-import org.tensorflow.lite.support.image.TensorImage
 import com.capstone.ayoperbaiki.ml.BlurImageModel
 import com.capstone.ayoperbaiki.utils.Utils.DATE_PICKER_TAG
 import com.capstone.ayoperbaiki.utils.Utils.EXTRA_DATA_ADDRESS
 import com.capstone.ayoperbaiki.utils.Utils.IMAGE_FILE_FORMAT
 import com.capstone.ayoperbaiki.utils.Utils.PERMISSION_REQUEST_CODE
 import com.capstone.ayoperbaiki.utils.Utils.REQUIRED_PERMISSION
+import com.capstone.ayoperbaiki.utils.gone
+import com.capstone.ayoperbaiki.utils.visible
+import com.dicoding.picodiploma.myalarmmanager.utils.DatePickerFragment
+import dagger.hilt.android.AndroidEntryPoint
+import org.tensorflow.lite.support.image.TensorImage
+import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
 
+typealias DisasterUtils = com.capstone.ayoperbaiki.utils.Disaster
+
+@AndroidEntryPoint
 class DisasterReportFormActivity
     : AppCompatActivity(), DatePickerFragment.DialogDateListener{
 
@@ -44,9 +49,12 @@ class DisasterReportFormActivity
     private lateinit var bindingForm: DisasterReportFormBinding
     private lateinit var outputImagePath: String
     private lateinit var address: Address
-    private lateinit var capturedImage: String
-    private lateinit var capturedImage2: String
-    private lateinit var capturedImage3: String
+    private val viewModel : ReportViewModel by viewModels()
+    private var capturedImage: String? = null
+    private var capturedImage2: String? = null
+    private var capturedImage3: String? = null
+    private var waktuKejadian: String? = null
+    private var isImageValid = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,21 +85,34 @@ class DisasterReportFormActivity
 
     override fun onResume() {
         super.onResume()
-        val disasterList = resources.getStringArray(R.array.list_disaster)
+
+        //Init dropdown kategori bencana
+        val disasterList = DisasterUtils.generateDisaster() as ArrayList<String>
+        disasterList.add("Lainnya")
+        Log.d(TAG, "onResume: list disaster $disasterList")
         val arrayAdapter = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, disasterList)
         bindingForm.edtTipeBencana.setAdapter(arrayAdapter)
+
+        //Init dropdown tipe kerusakan infrastruktur
+        val kerusakanList = DisasterUtils.generateKerusakanInfrastruktur2() as ArrayList<String>
+        kerusakanList.add("Lainnya")
+        Log.d(TAG, "onResume: list disaster $kerusakanList")
+        val arrayAdapter2 = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, kerusakanList)
+        bindingForm.edtTipeKerusakanInfrastruktur.setAdapter(arrayAdapter2)
     }
 
     private fun initForm() {
         var tipeBencana: String = bindingForm.edtTipeBencana.text.toString()
+        var idTipeBencana: Int = 0
         var jenisKerusakan: String = bindingForm.edtTipeKerusakanInfrastruktur.text.toString()
-        var waktu: String = bindingForm.edtWaktuBencana.text.toString()
+        var idJenisKerusakan: Int = 0
+        val addressDetail = "${address.knownName}, ${address.city}, ${address.country}, Kode Pos ${address.postalCode} (Latitude: ${address.latitude}, Longitude ${address.longitude})"
         var description: String = bindingForm.edtKeteranganBencana.text.toString()
         var linkDonasi: String = bindingForm.edtLinkDonasi.text.toString()
-        val addressDetail = "${address.city}, ${address.country}, Kode Pos ${address.postalCode} (Latitude: ${address.latitude}, Longitude ${address.longitude})"
 
         bindingForm.edtTipeBencana.setOnItemClickListener { parent, _, position, _ ->
             val item = parent.getItemAtPosition(position).toString()
+            idTipeBencana = position + 1
             when {
                 item == "Lainnya" -> {
                     bindingForm.actvTipeBencana2.visible()
@@ -124,6 +145,7 @@ class DisasterReportFormActivity
 
         bindingForm.edtTipeKerusakanInfrastruktur.setOnItemClickListener { parent, _, position, _ ->
             val item = parent.getItemAtPosition(position).toString()
+            idJenisKerusakan = position + 1
             when {
                 item == "Lainnya" -> {
                     bindingForm.actvTipeKerusakanInfrastruktur2.visible()
@@ -149,17 +171,16 @@ class DisasterReportFormActivity
                 }
                 item != "Lainnya" -> {
                     bindingForm.actvTipeKerusakanInfrastruktur2.gone()
-                    jenisKerusakan = bindingForm.edtTipeKerusakanInfrastruktur2.text.toString().trim()
+                    jenisKerusakan = bindingForm.edtTipeKerusakanInfrastruktur.text.toString().trim()
                 }
             }
         }
 
+        //data belum terambil dengan baik
         bindingForm.actvWaktuBencana.setEndIconOnClickListener {
             Toast.makeText(this, "TestEndIcon", Toast.LENGTH_SHORT).show()
             val datePickerFragment = DatePickerFragment()
             datePickerFragment.show(supportFragmentManager, DATE_PICKER_TAG)
-
-            waktu = bindingForm.edtWaktuBencana.text.toString().trim()
         }
 
         bindingForm.edtLokasiBencana.apply {
@@ -194,16 +215,70 @@ class DisasterReportFormActivity
         }
 
         bindingForm.btnSubmitForm.setOnClickListener {
-            // TODO: 04/06/2021 Membuat validasi form dan kirim data ke firebase
+            when{
+//                capturedImage.isNullOrEmpty() && capturedImage2.isNullOrEmpty() && capturedImage3.isNullOrEmpty() -> {
+                capturedImage.isNullOrEmpty() -> {
+                    Toast.makeText(
+                        this@DisasterReportFormActivity,
+                        "Mohon lengkapi data gambar infrastruktur yang rusak",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@setOnClickListener
+                }
+                !isImageValid -> {
+                    Toast.makeText(
+                        this@DisasterReportFormActivity,
+                        "Gambar masih tampak blur. Mohon ambil gambar kembali!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@setOnClickListener
+                }
+                tipeBencana.isEmpty() -> {
+                    Toast.makeText(this@DisasterReportFormActivity, "Form data belum lengkap 1", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                jenisKerusakan.isEmpty() -> {
+                    Toast.makeText(this@DisasterReportFormActivity, "Form data belum lengkap 2", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                waktuKejadian.isNullOrEmpty() -> {
+                    Toast.makeText(this@DisasterReportFormActivity, "Form data belum lengkap 3", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                addressDetail.isEmpty() -> {
+                    Toast.makeText(this@DisasterReportFormActivity, "Form data belum lengkap 4", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                description.isEmpty() -> {
+                    Toast.makeText(this@DisasterReportFormActivity, "Form data belum lengkap 5", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                else -> {
+                    Toast.makeText(this@DisasterReportFormActivity, "Form data sudah lengkap", Toast.LENGTH_SHORT).show()
 
-//            val resultForm = Report(
-//                address = address,
-//                description = description,
-//                photoUri = capturedImage
-//            )
+                    val feedback = Feedback(status = false, description = description)
+                    val disaster = Disaster(
+                        id = idTipeBencana,
+                        disasterName = tipeBencana
+                    )
+/*
+                    val resultForm = Report(
+
+                    )
+
+                    viewModel.setResultOfReportForm(resultForm)
+                    val statusInsertingReport = viewModel.insertFormReport()*/
+
+                    //Upload image
+//                    val listUriImage = listOf(capturedImage!!, capturedImage2!!, capturedImage3!!)
+                    //test upload one image
+                    val listUriImage = listOf(capturedImage!!)
+                    viewModel.uploadImage(listUriImage)
+                }
+            }
         }
 
-        Log.d(TAG, "initEditText: Isi data form\n$tipeBencana $jenisKerusakan $waktu $addressDetail $description $linkDonasi")
+        Log.d(TAG, "initEditText: Isi data form\n$tipeBencana $jenisKerusakan $waktuKejadian $addressDetail $description $linkDonasi")
     }
 
     private fun initCamera() {
@@ -287,17 +362,19 @@ class DisasterReportFormActivity
                 if(resultCode == RESULT_OK){
                     //Untuk mengambil hasil gambar full berdasarkan path
                     val imgFile = File(outputImagePath)
+                    Log.d(TAG, "onActivityResult: isi outputimagepath $outputImagePath lenght ${imgFile.length()}")
                     if (imgFile.exists()) {
+                        val resultPhoto = Uri.fromFile(imgFile)
+                        Log.d(TAG, "onActivityResult: isi Uri image 1 $resultPhoto")
 
-                        //validasi gambar blue atau tidak
+                        capturedImage = resultPhoto.toString()
+                        bindingForm.imgKerusakanInfrastruktur.setImageURI(resultPhoto)
+
+                        //validasi gambar blur atau tidak
                         val bitmap = BitmapFactory.decodeFile(outputImagePath)
-                        if(validateImage(bitmap)){
-                            val resultPhoto = Uri.fromFile(imgFile)
-                            capturedImage = resultPhoto.toString()
-                            bindingForm.imgKerusakanInfrastruktur.setImageURI(resultPhoto)
-                        } else {
-                            Toast.makeText(this@DisasterReportFormActivity, "Gambar tampak blur. Mohon ambil gambar kembali!", Toast.LENGTH_SHORT).show()
-                        }
+                        Log.d(TAG, "onActivityResult: ukuran foto fullnya width ${bitmap.height} height ${bitmap.width}")
+                        setValueImageIsValidOrNot(bitmap)
+
                     } else {
                         Toast.makeText(applicationContext, "Error: Image not captured", Toast.LENGTH_LONG).show()
                     }
@@ -312,15 +389,14 @@ class DisasterReportFormActivity
                     //Untuk mengambil hasil gambar full berdasarkan path
                     val imgFile = File(outputImagePath)
                     if (imgFile.exists()) {
-                        //validasi gambar blue atau tidak
+                        val resultPhoto = Uri.fromFile(imgFile)
+                        capturedImage2 = resultPhoto.toString()
+                        bindingForm.imgKerusakanInfrastruktur2.setImageURI(resultPhoto)
+
+                        //validasi gambar blur atau tidak
                         val bitmap = BitmapFactory.decodeFile(outputImagePath)
-                        if(validateImage(bitmap)){
-                            val resultPhoto = Uri.fromFile(imgFile)
-                            capturedImage2 = resultPhoto.toString()
-                            bindingForm.imgKerusakanInfrastruktur2.setImageURI(resultPhoto)
-                        } else {
-                            Toast.makeText(this@DisasterReportFormActivity, "Gambar tampak blur. Mohon ambil gambar kembali!", Toast.LENGTH_SHORT).show()
-                        }
+                        setValueImageIsValidOrNot(bitmap)
+
                     } else {
                         Toast.makeText(applicationContext, "Error: Image not captured", Toast.LENGTH_LONG).show()
                     }
@@ -333,15 +409,14 @@ class DisasterReportFormActivity
                     //Untuk mengambil hasil gambar full berdasarkan path
                     val imgFile = File(outputImagePath)
                     if (imgFile.exists()) {
-                        //validasi gambar blue atau tidak
+                        val resultPhoto = Uri.fromFile(imgFile)
+                        capturedImage3 = resultPhoto.toString()
+                        bindingForm.imgKerusakanInfrastruktur3.setImageURI(resultPhoto)
+
+                        //validasi gambar blur atau tidak
                         val bitmap = BitmapFactory.decodeFile(outputImagePath)
-                        if(validateImage(bitmap)){
-                            val resultPhoto = Uri.fromFile(imgFile)
-                            capturedImage3 = resultPhoto.toString()
-                            bindingForm.imgKerusakanInfrastruktur3.setImageURI(resultPhoto)
-                        } else {
-                            Toast.makeText(this@DisasterReportFormActivity, "Gambar tampak blur. Mohon ambil gambar kembali!", Toast.LENGTH_SHORT).show()
-                        }
+                        setValueImageIsValidOrNot(bitmap)
+
                     } else {
                         Toast.makeText(applicationContext, "Error: Image not captured", Toast.LENGTH_LONG).show()
                     }
@@ -363,7 +438,18 @@ class DisasterReportFormActivity
         val dateFormat = SimpleDateFormat("EEEE, d MMMM yyyy HH:mm:ss", Locale.getDefault())
 
         //Set text dari textview once
-        bindingForm.edtWaktuBencana.setText(dateFormat.format(calendar.time))
+        val time = dateFormat.format(calendar.time)
+        bindingForm.edtWaktuBencana.setText(time)
+        waktuKejadian = time
+    }
+
+    private fun setValueImageIsValidOrNot(bitmap: Bitmap){
+        if(validateImage(bitmap)){
+            isImageValid = true
+        } else {
+            isImageValid = false
+            Toast.makeText(this@DisasterReportFormActivity, "Gambar tampak blur. Mohon ambil gambar kembali!", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun validateImage(bitmap: Bitmap?) : Boolean {

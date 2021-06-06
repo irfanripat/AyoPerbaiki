@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">AyoPerbaiki!</string>
     <string name="detail_bencana">Detail Bencana</string>
     <string name="waktu_kejadian">Waktu Kejadian</string>
@@ -9,12 +9,9 @@
     <string name="feedback_if_false">Belum ada tindak lanjut</string>
     <string name="error_msg">Gagal mengambil data, pastikan koneksi internet anda tidak bermasalah</string>
     <string name="required_text_field">*wajib diisi</string>
-<<<<<<< HEAD
     <string name="captured_image">Captured Photos</string>
-=======
     <string name="no_return_address">Tidak ada data untuk koordinat ini</string>
-    <string name="search_view_hint">Ketik lokasi, tempat...</string>
->>>>>>> fe1c78e0455267fa6502aa2636b0744186dc338f
+    <string name="search_view_hint">Ketik lokasi, tempat…</string>
 
     <string-array name="list_disaster">
         <item>Gempa Vulkanik</item>
@@ -24,7 +21,7 @@
         <item>Tanah Longsor</item>
         <item>Banjir</item>
         <item>Kekeringan</item>
-        <item>Angin Puting Peliung</item>
+        <item tools:ignore="Typos">Angin Puting Peliung</item>
         <item>Abrasi</item>
         <item>Lainnya</item>
     </string-array>
