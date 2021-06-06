@@ -22,19 +22,15 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
-import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.GridLayoutManager
 import com.capstone.ayoperbaiki.R
 import com.capstone.ayoperbaiki.core.data.Resource
 import com.capstone.ayoperbaiki.core.domain.model.Address
-import com.capstone.ayoperbaiki.core.domain.model.Report
 import com.capstone.ayoperbaiki.databinding.ActivityDisasterReportFormBinding
 import com.capstone.ayoperbaiki.databinding.DisasterReportFormBinding
 import com.capstone.ayoperbaiki.ml.BlurImageModel
-import com.capstone.ayoperbaiki.utils.DatePickerFragment
 import com.capstone.ayoperbaiki.utils.Disaster
 import com.capstone.ayoperbaiki.utils.GridPhotoAdapter
-import com.capstone.ayoperbaiki.utils.Utils.DATE_PICKER_TAG
 import com.capstone.ayoperbaiki.utils.Utils.EXTRA_DATA_ADDRESS
 import com.capstone.ayoperbaiki.utils.Utils.IMAGE_FILE_FORMAT
 import com.capstone.ayoperbaiki.utils.Utils.PERMISSION_REQUEST_CODE
@@ -47,7 +43,6 @@ import com.google.firebase.Timestamp
 import com.jakewharton.rxbinding2.widget.RxTextView
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Observable
-import io.reactivex.functions.Function6
 import org.tensorflow.lite.support.image.TensorImage
 import java.io.File
 import java.io.IOException
@@ -56,16 +51,17 @@ import java.util.*
 
 @Suppress("DEPRECATION")
 @AndroidEntryPoint
-class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.DialogDateListener, View.OnClickListener{
+class DisasterReportFormActivity : AppCompatActivity(), View.OnClickListener{
 
     private lateinit var binding: ActivityDisasterReportFormBinding
     private lateinit var bindingForm: DisasterReportFormBinding
     private lateinit var outputImagePath: String
     private lateinit var address: Address
+    private var timeStamp : Timestamp? = null
     private val viewModel: ReportViewModel by viewModels()
     private lateinit var gridPhotoAdapter: GridPhotoAdapter
 
-    @SuppressLint("CheckResult")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDisasterReportFormBinding.inflate(layoutInflater)
@@ -76,49 +72,55 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
         showDataAddress()
         showRecyclerGrid()
         checkCameraPermission()
+        setUpViewBehavior()
+        observeSubmitReportProgressStatus()
         binding.btnBack.setOnClickListener(this)
+        binding.btnSubmit.setOnClickListener(this)
+    }
 
+    @SuppressLint("CheckResult")
+    private fun setUpViewBehavior() {
         val descriptionStream = RxTextView.textChanges(bindingForm.inputKeterangan)
-                .skipInitialValue()
-                .map { description ->
-                    description.isEmpty()
-                }
+            .skipInitialValue()
+            .map { description ->
+                description.isEmpty()
+            }
         descriptionStream.subscribe {
             showDescriptionExistAlert(it)
         }
 
         val disasterTypeStream = RxTextView.textChanges(bindingForm.inputKategoriBencana)
-                .skipInitialValue()
-                .map { disasterType ->
-                    Disaster.mapDisaster.getValue(7) == disasterType.toString()
-                }
+            .skipInitialValue()
+            .map { disasterType ->
+                Disaster.mapDisaster.getValue(7) == disasterType.toString()
+            }
         disasterTypeStream.subscribe {
             showCustomDisasterType(it)
         }
 
         val damageTypeStream = RxTextView.textChanges(bindingForm.inputJenisKerusakan)
-                .skipInitialValue()
-                .map { damageType ->
-                    Disaster.mapTypeOfDamage.getValue(13) == damageType.toString()
-                }
+            .skipInitialValue()
+            .map { damageType ->
+                Disaster.mapTypeOfDamage.getValue(13) == damageType.toString()
+            }
         damageTypeStream.subscribe{
             showCustomDamageType(it)
         }
 
         val customDisasterTypeStream = RxTextView.textChanges(bindingForm.inputKategoriBencanaLainnya)
-                .skipInitialValue()
-                .map { disasterType ->
-                    bindingForm.inputLayoutKategoriBencanaLainnya.isVisible && disasterType.isEmpty()
-                }
+            .skipInitialValue()
+            .map { disasterType ->
+                bindingForm.inputLayoutKategoriBencanaLainnya.isVisible && disasterType.isEmpty()
+            }
         customDisasterTypeStream.subscribe {
             showCustomDisasterExistAlert(it)
         }
 
         val customDamageTypeStream = RxTextView.textChanges(bindingForm.inputJenisKerusakanLainnya)
-                .skipInitialValue()
-                .map { damageType ->
-                    bindingForm.inputLayoutJenisKerusakanLainnya.isVisible && damageType.isEmpty()
-                }
+            .skipInitialValue()
+            .map { damageType ->
+                bindingForm.inputLayoutJenisKerusakanLainnya.isVisible && damageType.isEmpty()
+            }
         customDamageTypeStream.subscribe {
             showCustomDamageTypeExistAlert(it)
         }
@@ -390,18 +392,6 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
         }
     }
 
-
-    override fun onDialogDateSet(tag: String?, year: Int, month: Int, dayOfMonth: Int) {
-        val calendar = Calendar.getInstance()
-        calendar.set(year, month, dayOfMonth)
-
-        //Tuesday, 01 January 2021 12:30:00
-        val dateFormat = SimpleDateFormat("EEEE, d MMMM yyyy HH:mm:ss", Locale.getDefault())
-
-        //Set text dari textview once
-//        bindingForm.edtWaktuBe ncana.setText(dateFormat.format(calendar.time))
-    }
-
     private fun validateImage(bitmap: Bitmap?) : Boolean {
         val model = BlurImageModel.newInstance(this)
         val image = TensorImage.fromBitmap(bitmap)
@@ -417,8 +407,28 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
         }
     }
 
-    private fun submitReport(report: Report) {
-        viewModel.submitReport(report)
+    private fun submitReport() {
+        var selectedDisasterType: String
+        var selectedDamageType: String
+        with(bindingForm) {
+            val disasterType = inputKategoriBencana.text.toString().trim()
+            val customDisasterType = inputKategoriBencanaLainnya.text.toString().trim()
+            val damageType = inputJenisKerusakan.text.toString().trim()
+            val customDamageType = inputJenisKerusakanLainnya.text.toString().trim()
+            val disasterTime = timeStamp
+            val disasterAddress = address
+            val disasterDescription = inputKeterangan.text.toString().trim()
+
+            selectedDisasterType = if (Disaster.mapDisaster.getValue(7) == disasterType) customDisasterType else disasterType
+            selectedDamageType = if (Disaster.mapTypeOfDamage.getValue(13) == damageType) customDamageType else damageType
+
+            Toast.makeText(this@DisasterReportFormActivity, "$selectedDisasterType \n$selectedDamageType \n$disasterTime $disasterAddress $disasterDescription", Toast.LENGTH_SHORT).show()
+
+            //iterate upload image to storage one by one
+            //save the return to a variable
+            //make report object
+            //upload to firebase storage
+        }
     }
 
     private fun observeSubmitReportProgressStatus() {
@@ -441,14 +451,12 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
         })
     }
 
-    companion object{
-        private val TAG = DisasterReportFormActivity::class.java.simpleName
-        private const val CAPTURE_IMAGE_FROM_CAMERA_REQUEST_CODE = 100
-    }
-
     override fun onClick(view: View?) {
         when(view) {
             binding.btnBack -> confirmBack()
+            binding.btnSubmit -> {
+                submitReport()
+            }
         }
     }
 
@@ -469,9 +477,14 @@ class DisasterReportFormActivity : AppCompatActivity(), DatePickerFragment.Dialo
             TimePickerDialog(this, { _, hour, minute ->
                 val pickedDateTime = Calendar.getInstance()
                 pickedDateTime.set(year, month, day, hour, minute)
-                val timeStamp = Timestamp(Date(pickedDateTime.timeInMillis))
-                bindingForm.inputWaktu.setText(getDateTime(timeStamp))
+                timeStamp = Timestamp(Date(pickedDateTime.timeInMillis))
+                bindingForm.inputWaktu.setText(getDateTime(timeStamp!!))
             }, startHour, startMinute, false).show()
         }, startYear, startMonth, startDay).show()
+    }
+
+    companion object{
+        private val TAG = DisasterReportFormActivity::class.java.simpleName
+        private const val CAPTURE_IMAGE_FROM_CAMERA_REQUEST_CODE = 100
     }
 }
