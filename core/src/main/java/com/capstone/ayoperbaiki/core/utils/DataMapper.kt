@@ -12,14 +12,13 @@ object DataMapper {
         val reportList = ArrayList<Report>()
         input.map {
             val report = Report(
-                    id = it.id,
                     disaster = Disaster(it.disaster.id, it.disaster.disasterName),
-                    address = Address(it.address.address, it.address.city, it.address.state, it.address.country, it.address.postalCode, it.address.knownName, it.address.latitude, it.address.longitude),
+                    address = Address(it.address.address, it.address.city, it.address.state, it.address.country, it.address.latitude, it.address.longitude),
                     timeStamp = it.timeStamp,
                     description = it.description,
                     feedback = Feedback(it.feedback.status, it.feedback.description),
                     photoUri = it.photoUri,
-//                    typeOfDamage = it.typeOfDamage,
+                    typeOfDamage = it.typeOfDamage,
             )
             reportList.add(report)
         }

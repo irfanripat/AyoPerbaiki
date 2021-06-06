@@ -17,7 +17,6 @@ import javax.inject.Inject
 class ReportViewModel @Inject constructor(private val reportUseCase: ReportUseCase): ViewModel() {
 
     private val _submitReportStatus = MutableLiveData<Resource<Boolean>>()
-
     val submitReportStatus : LiveData<Resource<Boolean>> = _submitReportStatus
 
     fun submitReport(report: Report)  {

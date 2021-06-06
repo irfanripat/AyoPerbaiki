@@ -4,12 +4,11 @@
 import com.google.firebase.Timestamp
 
 data class Report(
-    val id: Int,
-    val timeStamp: Timestamp,
     val disaster: Disaster,
-//    val typeOfDamage: String,
     val address: Address,
+    val timeStamp: Timestamp,
+    val typeOfDamage: String,
     val description: String,
     val feedback: Feedback,
-    val photoUri: String
+    val photoUri: List<String>
 )
