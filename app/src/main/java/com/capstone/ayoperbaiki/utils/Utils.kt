@@ -8,6 +8,7 @@ import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.absoluteValue
 
 object Utils {
     const val EXTRA_DATA_ADDRESS = "extra_data_address"
@@ -26,7 +27,7 @@ object Utils {
     const val LIMIT_PICTURE = 3
 
     fun Double.roundOffDecimal(): Double {
-        val df = DecimalFormat("#.####", DecimalFormatSymbols(Locale.ENGLISH))
+        val df = DecimalFormat("#.##", DecimalFormatSymbols(Locale.ENGLISH))
         df.roundingMode = RoundingMode.CEILING
         return df.format(this).toDouble()
     }
@@ -40,6 +41,34 @@ object Utils {
 
     fun <K, V> getKey(hashMap: Map<K, V>, target: V): K {
         return hashMap.filter { target == it.value }.keys.first()
+    }
+
+    fun Double.toStringLatitude() : String {
+       return when {
+            this > 0 -> {
+                String.format("${this.absoluteValue}° LU")
+            }
+            this == 0.0 -> {
+                String.format("${this.absoluteValue}°")
+            }
+            else -> {
+                return String.format("${this.absoluteValue}° LS")
+            }
+        }
+    }
+
+    fun Double.toStringLongitude() : String {
+        return when {
+            this > 0 -> {
+                String.format("${this.absoluteValue}° BT")
+            }
+            this == 0.0 -> {
+                String.format("${this.absoluteValue}°")
+            }
+            else -> {
+                return String.format("${this.absoluteValue}° BB")
+            }
+        }
     }
 
 }

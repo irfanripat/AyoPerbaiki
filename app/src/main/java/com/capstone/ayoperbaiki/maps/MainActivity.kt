@@ -5,6 +5,7 @@ import android.content.Intent
 import android.location.Geocoder
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -21,12 +22,15 @@ import com.capstone.ayoperbaiki.core.domain.model.Report
 import com.capstone.ayoperbaiki.databinding.ActivityMainBinding
 import com.capstone.ayoperbaiki.form.DisasterReportFormActivity
 import com.capstone.ayoperbaiki.utils.DisasterData.mapDisasterIcon
+import com.capstone.ayoperbaiki.utils.DisasterData.mapDisasterTypeIcon
 import com.capstone.ayoperbaiki.utils.Utils.EXTRA_DATA_ADDRESS
 import com.capstone.ayoperbaiki.utils.Utils.STARTING_COORDINATE
 import com.capstone.ayoperbaiki.utils.Utils.getDateTime
 import com.capstone.ayoperbaiki.utils.Utils.hide
 import com.capstone.ayoperbaiki.utils.Utils.roundOffDecimal
 import com.capstone.ayoperbaiki.utils.Utils.show
+import com.capstone.ayoperbaiki.utils.Utils.toStringLatitude
+import com.capstone.ayoperbaiki.utils.Utils.toStringLongitude
 import com.google.android.gms.common.api.Status
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -205,7 +209,7 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
                                     )
                                 )
                                 .title(report.disaster.disasterName)
-                                .icon( if (report.disaster.id == 7) BitmapDescriptorFactory.fromResource(R.drawable.ic_banjir) else BitmapDescriptorFactory.fromResource(mapDisasterIcon.getValue(report.disaster.id)))
+                                .icon(BitmapDescriptorFactory.fromResource(mapDisasterIcon.getValue(report.disaster.id)))
                         )
                     }
                 }
@@ -227,17 +231,20 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
 
     private fun displayDetailDisaster(report: Report) {
         val tvDisasterName = findViewById<TextView>(R.id.tv_disaster_type)
+        val tvDamageType = findViewById<TextView>(R.id.tv_damage_type)
         val tvDisasterAddress = findViewById<TextView>(R.id.tv_disaster_address)
         val tvDisasterLatLng = findViewById<TextView>(R.id.tv_disaster_latlng)
         val tvDisasterDesc = findViewById<TextView>(R.id.tv_disaster_desc)
         val tvDisasterTime = findViewById<TextView>(R.id.tv_disaster_time)
         val tvFeedback = findViewById<TextView>(R.id.tv_disaster_feedback)
         val imgDisaster = findViewById<ImageView>(R.id.image_disaster)
+        val imgDisasterType = findViewById<ImageView>(R.id.image_disaster_type)
 
         with(report) {
             tvDisasterName.text = disaster.disasterName
+            tvDamageType.text = typeOfDamage
             tvDisasterAddress.text = String.format("${address.address}, ${address.city.replace("Kabupaten ", "").replace("Kota ", "")}")
-            tvDisasterLatLng.text = String.format("${address.latitude.roundOffDecimal()}°, ${address.longitude.roundOffDecimal()}°")
+            tvDisasterLatLng.text = String.format("${address.latitude.roundOffDecimal().toStringLatitude()}, ${address.longitude.roundOffDecimal().toStringLongitude()}")
             tvDisasterDesc.text = description
             tvDisasterTime.text = getDateTime(timeStamp)
             Glide.with(this@MainActivity)
@@ -246,6 +253,10 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(true)
                 .into(imgDisaster)
+
+            Glide.with(this@MainActivity)
+                .load(mapDisasterTypeIcon[disaster.id])
+                .into(imgDisasterType)
 
             if(feedback.status) {
                 tvFeedback.text = feedback.description

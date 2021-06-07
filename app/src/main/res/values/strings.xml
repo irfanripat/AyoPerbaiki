@@ -3,7 +3,7 @@
     <string name="detail_bencana">Detail Bencana</string>
     <string name="waktu_kejadian">Waktu Kejadian</string>
     <string name="sample_text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
-    <string name="lokasi_kejadian">Lokasi Kejadian</string>
+    <string name="lokasi_kejadian">Koordinat Kejadian</string>
     <string name="feedback">Feedback :</string>
     <string name="feedback_if_false">Belum ada tindak lanjut</string>
     <string name="error_msg">Gagal mengambil data, pastikan koneksi internet anda tidak bermasalah</string>
@@ -32,5 +32,7 @@
     <string name="permission_storage_request">Aplikasi membutuhkan izin akses penyimpanan eksternal untuk menyimpan gambar</string>
     <string name="permission_camera_request">Aplikasi membutuhkan kamera dan storage untuk mengambil gambar kerusakan bencana</string>
     <string name="blur_image_msg">Gambar kurang jelas. Mohon ambil gambar kembali!</string>
+    <string name="jenis_kerusakan">Jenis Kerusakan</string>
+    <string name="keterangan">Keterangan</string>
 
 </resources>
