@@ -438,7 +438,7 @@ class DisasterReportFormActivity : AppCompatActivity(), EasyPermissions.Permissi
             selectedDamageType = if (mapTypeOfDamage.getValue(13) == damageType) customDamageType else damageType
 
             viewModel.addReport(Report(
-                    Disaster(getKey(mapDisaster, selectedDisasterType), selectedDisasterType),
+                    Disaster(if (mapDisaster.getValue(7) == disasterType) 7 else getKey(mapDisaster, selectedDisasterType), selectedDisasterType),
                     disasterAddress,
                     disasterTime!!,
                     selectedDamageType,
