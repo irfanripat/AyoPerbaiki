@@ -32,8 +32,11 @@
     <string name="tipe_kerusakan_infrastruktur">Tipe Kerusakan Infrastruktur</string>
     <string name="tambahkan_bukti_gambar_kerusakan">Tambahkan bukti gambar kerusakan:</string>
     <string name="image_not_captured">Gambar tidak tertangkap</string>
-    <string name="failed_save_image">Error saat menyimpan gambar.</string>
+    <string name="failed_save_image">Batal mengambil gambar.</string>
     <string name="permission_denies_msg">Anda tidak mengizinkan aplikasi untuk mengakses kamera</string>
+    <string name="permission_storage_request">Aplikasi membutuhkan izin akses penyimpanan eksternal untuk menyimpan gambar</string>
+    <string name="permission_camera_request">Aplikasi membutuhkan kamera untuk mengambil gambar kerusakan bencana</string>
+    <string name="blur_image_msg">Gambar kurang jelas. Mohon ambil gambar kembali!</string>
 
 
     <string-array name="list_disaster">

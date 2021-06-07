@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.capstone.ayoperbaiki.R
 import com.capstone.ayoperbaiki.databinding.ItemAddPhotoBinding
 import com.capstone.ayoperbaiki.databinding.ItemPhotoBinding
@@ -72,8 +73,10 @@ class GridPhotoAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         fun bind(path: String, position: Int) {
             Glide.with(itemView.context)
-                    .load(path)
-                    .into(binding.imgDisaster)
+                .load(path)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
+                .into(binding.imgDisaster)
 
             binding.imgDisaster.setOnLongClickListener {
                 onItemClick?.invoke(position)

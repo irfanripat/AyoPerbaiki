@@ -12,6 +12,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.capstone.ayoperbaiki.BuildConfig
 import com.capstone.ayoperbaiki.R
 import com.capstone.ayoperbaiki.core.data.Resource
@@ -246,9 +247,11 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
             tvDisasterDesc.text = description
             tvDisasterTime.text = getDateTime(timeStamp)
             Glide.with(this@MainActivity)
-                    .load(photoUri[0])
-                    .placeholder(R.drawable.default_placeholder)
-                    .into(imgDisaster)
+                .load(photoUri[0])
+                .placeholder(R.drawable.default_placeholder)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
+                .into(imgDisaster)
 
             if(feedback.status) {
                 tvFeedback.text = feedback.description

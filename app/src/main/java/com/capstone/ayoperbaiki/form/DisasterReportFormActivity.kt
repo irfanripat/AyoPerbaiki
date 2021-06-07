@@ -1,10 +1,10 @@
 package com.capstone.ayoperbaiki.form
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -17,7 +17,6 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.content.res.ResourcesCompat
@@ -32,15 +31,16 @@ import com.capstone.ayoperbaiki.core.domain.model.Report
 import com.capstone.ayoperbaiki.databinding.ActivityDisasterReportFormBinding
 import com.capstone.ayoperbaiki.databinding.DisasterReportFormBinding
 import com.capstone.ayoperbaiki.ml.BlurImageModel
+import com.capstone.ayoperbaiki.utils.Constants.REQUEST_CODE_CAMERA_PERMISSION
+import com.capstone.ayoperbaiki.utils.Constants.REQUEST_CODE_EXTERNAL_STORAGE_PERMISSION
 import com.capstone.ayoperbaiki.utils.DisasterData.generateDisaster
 import com.capstone.ayoperbaiki.utils.DisasterData.generateListTypeOfDamage
 import com.capstone.ayoperbaiki.utils.DisasterData.mapDisaster
 import com.capstone.ayoperbaiki.utils.DisasterData.mapTypeOfDamage
 import com.capstone.ayoperbaiki.utils.GridPhotoAdapter
+import com.capstone.ayoperbaiki.utils.TrackingUtility
 import com.capstone.ayoperbaiki.utils.Utils.EXTRA_DATA_ADDRESS
 import com.capstone.ayoperbaiki.utils.Utils.IMAGE_FILE_FORMAT
-import com.capstone.ayoperbaiki.utils.Utils.PERMISSION_REQUEST_CODE
-import com.capstone.ayoperbaiki.utils.Utils.REQUIRED_PERMISSION
 import com.capstone.ayoperbaiki.utils.Utils.getDateTime
 import com.capstone.ayoperbaiki.utils.Utils.getKey
 import com.capstone.ayoperbaiki.utils.Utils.hide
@@ -51,14 +51,18 @@ import com.jakewharton.rxbinding2.widget.RxTextView
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Observable
 import org.tensorflow.lite.support.image.TensorImage
+import pub.devrel.easypermissions.AppSettingsDialog
+import pub.devrel.easypermissions.EasyPermissions
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
 @Suppress("DEPRECATION")
 @AndroidEntryPoint
-class DisasterReportFormActivity : AppCompatActivity(), View.OnClickListener{
+class DisasterReportFormActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, View.OnClickListener{
 
     private lateinit var binding: ActivityDisasterReportFormBinding
     private lateinit var bindingForm: DisasterReportFormBinding
@@ -78,11 +82,32 @@ class DisasterReportFormActivity : AppCompatActivity(), View.OnClickListener{
         initFormInputAdapter()
         showDataAddress()
         showRecyclerGrid()
-        checkCameraPermission()
         setUpViewBehavior()
+        requestPermission()
         observeSubmitReportProgressStatus()
+        observeUploadImageProgressStatus()
         binding.btnBack.setOnClickListener(this)
         binding.btnSubmit.setOnClickListener(this)
+    }
+
+    private fun requestPermission() {
+        if (TrackingUtility.hasCameraPermission(this) && TrackingUtility.hasReadExternalStoragePermission(this)) {
+            initAdapterListener()
+            return
+        }
+        EasyPermissions.requestPermissions(
+                this,
+                getString(R.string.permission_camera_request),
+                REQUEST_CODE_CAMERA_PERMISSION,
+                Manifest.permission.CAMERA
+        )
+        EasyPermissions.requestPermissions(
+                this,
+                getString(R.string.permission_storage_request),
+                REQUEST_CODE_EXTERNAL_STORAGE_PERMISSION,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+        )
     }
 
     @SuppressLint("CheckResult")
@@ -151,18 +176,20 @@ class DisasterReportFormActivity : AppCompatActivity(), View.OnClickListener{
             customDamageTypeStream.map {!it}
         )
 
-        Observable.combineLatest(validDisasterTypeStream, validDamageTypeStream, disasterTimeStream, descriptionStream) {a, b, c, d ->
+        Observable.combineLatest(validDisasterTypeStream, validDamageTypeStream, disasterTimeStream, descriptionStream) { a, b, c, d ->
             a && b && !c && !d
         }.subscribe { isValid ->
-            binding.btnSubmit.apply {
-                if (isValid) {
-                    isEnabled = true
-                    setBackgroundColor(ContextCompat.getColor(this@DisasterReportFormActivity, R.color.ss_top))
-                } else {
-                    isEnabled = false
-                    setBackgroundColor(ContextCompat.getColor(this@DisasterReportFormActivity, R.color.quantum_grey400))
+            viewModel.listPhotoUri.observe(this, { list ->
+                binding.btnSubmit.apply {
+                    if (isValid && list.isNotEmpty()) {
+                        isEnabled = true
+                        setBackgroundColor(ContextCompat.getColor(this@DisasterReportFormActivity, R.color.ss_top))
+                    } else {
+                        isEnabled = false
+                        setBackgroundColor(ContextCompat.getColor(this@DisasterReportFormActivity, R.color.quantum_grey400))
+                    }
                 }
-            }
+            })
         }
     }
 
@@ -242,14 +269,6 @@ class DisasterReportFormActivity : AppCompatActivity(), View.OnClickListener{
         }
     }
 
-    private fun checkCameraPermission() {
-        if(isPermissionGranted()){
-            initAdapterListener()
-        } else {
-            ActivityCompat.requestPermissions(this, REQUIRED_PERMISSION, PERMISSION_REQUEST_CODE)
-        }
-    }
-
     private fun showDataAddress() {
         with(address) {
             bindingForm.inputAlamat.setText(String.format("$address, $district"))
@@ -296,12 +315,7 @@ class DisasterReportFormActivity : AppCompatActivity(), View.OnClickListener{
         }
         gridPhotoAdapter.onItemClick = {
             gridPhotoAdapter.deleteDataAtIndex(it)
-        }
-    }
-
-    private fun isPermissionGranted(): Boolean {
-        return REQUIRED_PERMISSION.all {
-            ContextCompat.checkSelfPermission(baseContext, it) != PackageManager.PERMISSION_GRANTED
+            viewModel.removePhotoUri(it)
         }
     }
     
@@ -356,12 +370,19 @@ class DisasterReportFormActivity : AppCompatActivity(), View.OnClickListener{
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if(isPermissionGranted()){
-            initAdapterListener()
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
+    }
+
+    override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {}
+
+    override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
+        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
+            AppSettingsDialog.Builder(this).build().show()
         } else {
-            Toast.makeText(this, getString(R.string.permission_denies_msg), Toast.LENGTH_SHORT).show()
+            requestPermission()
         }
     }
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -372,32 +393,26 @@ class DisasterReportFormActivity : AppCompatActivity(), View.OnClickListener{
                     if (imgFile.exists()) {
                         val bitmap = BitmapFactory.decodeFile(outputImagePath)
                         if (validateImage(bitmap)) {
+                            val storageDir: File = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
                             val resultPhoto = Uri.fromFile(imgFile)
+                            val newCompressedImage = bitmap.compress(storageDir)
+                            if (newCompressedImage.exists()) {
+                                viewModel.addPhotoUri(Uri.fromFile(newCompressedImage))
+                            }
                             gridPhotoAdapter.addData(resultPhoto.toString())
                         } else {
-                            Toast.makeText(
-                                this@DisasterReportFormActivity,
-                                "Gambar tampak blur. Mohon ambil gambar kembali!",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Toast.makeText(this@DisasterReportFormActivity, getString(R.string.blur_image_msg), Toast.LENGTH_SHORT).show()
                         }
                     } else {
-                        Toast.makeText(
-                            applicationContext,
-                            getString(R.string.image_not_captured),
-                            Toast.LENGTH_LONG
-                        ).show()
+                        Toast.makeText(applicationContext, getString(R.string.image_not_captured), Toast.LENGTH_LONG).show()
                     }
                 } else {
-                    Toast.makeText(
-                        applicationContext,
-                        getString(R.string.failed_save_image),
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Toast.makeText(applicationContext, getString(R.string.failed_save_image), Toast.LENGTH_LONG).show()
                 }
             }
         }
     }
+
 
     private fun validateImage(bitmap: Bitmap?) : Boolean {
         val model = BlurImageModel.newInstance(this)
@@ -429,23 +444,55 @@ class DisasterReportFormActivity : AppCompatActivity(), View.OnClickListener{
             selectedDisasterType = if (mapDisaster.getValue(7) == disasterType) customDisasterType else disasterType
             selectedDamageType = if (mapTypeOfDamage.getValue(13) == damageType) customDamageType else damageType
 
-            Toast.makeText(this@DisasterReportFormActivity, "$selectedDisasterType \n$selectedDamageType \n$disasterTime $disasterAddress $disasterDescription", Toast.LENGTH_SHORT).show()
-
             //iterate upload image to storage one by one
             //save the return to a variable
             //make report object
+
             val report = Report(
-                Disaster(getKey(mapDisaster, selectedDisasterType), selectedDisasterType),
-                address,
-                disasterTime!!,
-                selectedDamageType,
-                disasterDescription,
-                Feedback(false, ""),
-                listOf("https://firebasestorage.googleapis.com/v0/b/ayoperbaiki.appspot.com/o/064242000_1577883977-IMG-20200101-0053.jpg?alt=media&token=30239432-4463-4673-ac67-53eacf3d69f8")
+                    Disaster(getKey(mapDisaster, selectedDisasterType), selectedDisasterType),
+                    disasterAddress,
+                    disasterTime!!,
+                    selectedDamageType,
+                    disasterDescription,
+                    Feedback(false, ""),
+                    viewModel.listPhotoUrl.value!!
             )
             viewModel.submitReport(report)
-            //upload to firebase storage
         }
+    }
+
+    private fun observeUploadImageProgressStatus() {
+        viewModel.uploadImageStatus.observe(this@DisasterReportFormActivity, { status ->
+            if (status != null) {
+                when (status) {
+                    is Resource.Failure -> {
+                        //gagal mengupload image
+                    }
+                    is Resource.Loading -> {
+                        //
+                    }
+                    is Resource.Success -> {
+                        Toast.makeText(this, viewModel.listPhotoUrl.value.toString(), Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        })
+
+        viewModel.uploadImagePercentage.observe(this, {
+            Log.d("UPLOAD_PERCENTAGE", it.toString())
+        })
+
+    }
+
+    private fun Bitmap.compress(cacheDir: File): File {
+        val compressedFile = File(cacheDir, "${System.currentTimeMillis()}.jpg")
+        compressedFile.createNewFile()
+        ByteArrayOutputStream().use { stream ->
+            compress(Bitmap.CompressFormat.JPEG, 70, stream)
+            val bArray = stream.toByteArray()
+            FileOutputStream(compressedFile).use { os -> os.write(bArray) }
+        }
+        return compressedFile
     }
 
     private fun observeSubmitReportProgressStatus() {
@@ -473,9 +520,7 @@ class DisasterReportFormActivity : AppCompatActivity(), View.OnClickListener{
     override fun onClick(view: View?) {
         when(view) {
             binding.btnBack -> confirmBack()
-            binding.btnSubmit -> {
-                submitReport()
-            }
+            binding.btnSubmit -> submitReport()
         }
     }
 
