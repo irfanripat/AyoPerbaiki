@@ -452,6 +452,7 @@ class DisasterReportFormActivity : AppCompatActivity(), EasyPermissions.Permissi
                     listOf()
             ))
             viewModel.uploadImage()
+            //submit report automatically executed when upload image is completed
         }
     }
 
