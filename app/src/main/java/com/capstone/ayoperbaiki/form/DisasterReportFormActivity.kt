@@ -32,7 +32,6 @@ import com.capstone.ayoperbaiki.databinding.ActivityDisasterReportFormBinding
 import com.capstone.ayoperbaiki.databinding.DisasterReportFormBinding
 import com.capstone.ayoperbaiki.ml.BlurImageModel
 import com.capstone.ayoperbaiki.utils.Constants.REQUEST_CODE_CAMERA_PERMISSION
-import com.capstone.ayoperbaiki.utils.Constants.REQUEST_CODE_EXTERNAL_STORAGE_PERMISSION
 import com.capstone.ayoperbaiki.utils.DisasterData.generateDisaster
 import com.capstone.ayoperbaiki.utils.DisasterData.generateListTypeOfDamage
 import com.capstone.ayoperbaiki.utils.DisasterData.mapDisaster
@@ -96,19 +95,15 @@ class DisasterReportFormActivity : AppCompatActivity(), EasyPermissions.Permissi
             return
         }
         EasyPermissions.requestPermissions(
-                this,
-                getString(R.string.permission_camera_request),
-                REQUEST_CODE_CAMERA_PERMISSION,
-                Manifest.permission.CAMERA
-        )
-        EasyPermissions.requestPermissions(
-                this,
-                getString(R.string.permission_storage_request),
-                REQUEST_CODE_EXTERNAL_STORAGE_PERMISSION,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE
+            this,
+            getString(R.string.permission_camera_request),
+            REQUEST_CODE_CAMERA_PERMISSION,
+            Manifest.permission.CAMERA,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
         )
     }
+
 
     @SuppressLint("CheckResult")
     private fun setUpViewBehavior() {
