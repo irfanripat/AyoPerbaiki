@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <string name="app_name">AyoPerbaiki!</string>
     <string name="detail_bencana">Detail Bencana</string>
     <string name="waktu_kejadian">Waktu Kejadian</string>
@@ -9,9 +9,35 @@
     <string name="feedback_if_false">Belum ada tindak lanjut</string>
     <string name="error_msg">Gagal mengambil data, pastikan koneksi internet anda tidak bermasalah</string>
     <string name="required_text_field">*wajib diisi</string>
+
     <string name="captured_image">Captured Photos</string>
+
     <string name="no_return_address">Tidak ada data untuk koordinat ini</string>
-    <string name="search_view_hint">Ketik lokasi, tempat…</string>
+    <string name="search_view_hint">Ketik lokasi, tempat...</string>
+    <string name="form_title">Formulir Kerusakan Infrastruktur</string>
+    <string name="back">Back</string>
+    <string name="submit_form">Submit Form</string>
+    <string name="form_caution">Mohon mengisi form kerusakan bencana berikut ini dengan data yang valid dan benar.</string>
+    <string name="lokasi_bencana">Lokasi Bencana</string>
+    <string name="garis_lintang">Garis Lintang</string>
+    <string name="garis_bujur">Garis Bujur</string>
+    <string name="text_warning_lokasi_bencana">Data lokasi bencana tidak dapat diubah pada halaman ini. Jika ada ingin melakukan perubahan anda dapat kembali ke halaman maps untuk memilih lokasi yang baru.</string>
+    <string name="buat_laporan">Buat Laporan</string>
+    <string name="alamat">Alamat</string>
+    <string name="kota_kabupaten">Kota/Kabupaten</string>
+    <string name="provinsi">Provinsi</string>
+    <string name="star">**</string>
+    <string name="detail_kerusakan_bencana">Detail Kerusakan Bencana</string>
+    <string name="kategori_bencana">Kategori Bencana</string>
+    <string name="tipe_kerusakan_infrastruktur">Tipe Kerusakan Infrastruktur</string>
+    <string name="tambahkan_bukti_gambar_kerusakan">Tambahkan bukti gambar kerusakan:</string>
+    <string name="image_not_captured">Gambar tidak tertangkap</string>
+    <string name="failed_save_image">Batal mengambil gambar.</string>
+    <string name="permission_denies_msg">Anda tidak mengizinkan aplikasi untuk mengakses kamera</string>
+    <string name="permission_storage_request">Aplikasi membutuhkan izin akses penyimpanan eksternal untuk menyimpan gambar</string>
+    <string name="permission_camera_request">Aplikasi membutuhkan kamera untuk mengambil gambar kerusakan bencana</string>
+    <string name="blur_image_msg">Gambar kurang jelas. Mohon ambil gambar kembali!</string>
+
 
     <string-array name="list_disaster">
         <item>Gempa Vulkanik</item>
@@ -21,7 +47,7 @@
         <item>Tanah Longsor</item>
         <item>Banjir</item>
         <item>Kekeringan</item>
-        <item tools:ignore="Typos">Angin Puting Peliung</item>
+        <item>Angin Puting Peliung</item>
         <item>Abrasi</item>
         <item>Lainnya</item>
     </string-array>

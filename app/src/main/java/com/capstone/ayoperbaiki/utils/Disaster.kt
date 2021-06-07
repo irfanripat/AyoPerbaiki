@@ -2,15 +2,16 @@ package com.capstone.ayoperbaiki.utils
 
 import com.capstone.ayoperbaiki.R
 
-object Disaster {
+object DisasterData {
 
-    val mapDisaster = mapOf(
+    val mapDisaster : Map<Int, String> = mapOf(
             1 to "Banjir",
             2 to "Kebakaran Hutan",
             3 to "Gempa Bumi",
             4 to "Tsunami",
             5 to "Tanah Longsor",
-            6 to "Gunung Meletus"
+            6 to "Gunung Meletus",
+            7 to "Lainnya"
     )
 
     fun generateDisaster(): List<String>{
@@ -21,7 +22,7 @@ object Disaster {
        }
     }
 
-    val mapKerusakanInfrastruktur = mapOf(
+    val mapTypeOfDamage = mapOf(
             1 to "Jaringan Listrik",
             2 to "Jalan Raya",
             3 to "Jembatan",
@@ -33,12 +34,13 @@ object Disaster {
             9 to "Sekolah",
             10 to "Stadion",
             11 to "Puskesmas",
-            12 to "Bendungan"
+            12 to "Bendungan",
+            13 to "Lainnya"
     )
 
-    fun generateKerusakanInfrastruktur2(): List<String>{
+    fun generateListTypeOfDamage(): List<String>{
        return ArrayList<String>().apply {
-           mapKerusakanInfrastruktur.forEach {
+           mapTypeOfDamage.forEach {
                this.add(it.value)
            }
        }

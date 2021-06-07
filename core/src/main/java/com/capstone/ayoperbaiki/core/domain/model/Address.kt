@@ -6,11 +6,10 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class Address(
         val address: String,
+        val district: String,
         val city: String,
         val state: String,
         val country: String,
-        val postalCode: String,
-        val knownName: String,
         val latitude: Double,
         val longitude: Double
 ) : Parcelable

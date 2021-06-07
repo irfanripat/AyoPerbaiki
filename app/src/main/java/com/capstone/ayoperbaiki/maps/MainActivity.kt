@@ -12,6 +12,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.capstone.ayoperbaiki.BuildConfig
 import com.capstone.ayoperbaiki.R
 import com.capstone.ayoperbaiki.core.data.Resource
@@ -19,10 +20,12 @@ import com.capstone.ayoperbaiki.core.domain.model.Address
 import com.capstone.ayoperbaiki.core.domain.model.Report
 import com.capstone.ayoperbaiki.databinding.ActivityMainBinding
 import com.capstone.ayoperbaiki.form.DisasterReportFormActivity
-import com.capstone.ayoperbaiki.utils.Disaster.mapDisasterIcon
+import com.capstone.ayoperbaiki.utils.DisasterData.mapDisasterIcon
 import com.capstone.ayoperbaiki.utils.Utils.EXTRA_DATA_ADDRESS
 import com.capstone.ayoperbaiki.utils.Utils.STARTING_COORDINATE
+import com.capstone.ayoperbaiki.utils.Utils.getDateTime
 import com.capstone.ayoperbaiki.utils.Utils.hide
+import com.capstone.ayoperbaiki.utils.Utils.roundOffDecimal
 import com.capstone.ayoperbaiki.utils.Utils.show
 import com.google.android.gms.common.api.Status
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -36,25 +39,21 @@ import com.google.android.libraries.places.widget.listener.PlaceSelectionListene
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
-import com.google.firebase.Timestamp
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.IOException
-import java.math.RoundingMode
-import java.text.DecimalFormat
-import java.text.DecimalFormatSymbols
-import java.text.SimpleDateFormat
 import java.util.*
+
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
 
-    private lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
-    private lateinit var mapFragment: SupportMapFragment
     private lateinit var binding : ActivityMainBinding
     private val viewModel : MainViewModel by viewModels()
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
+    private lateinit var mapFragment: SupportMapFragment
     private var selectedMarker: Marker? = null
     private var selectedAddress: Address? = null
 
@@ -71,6 +70,14 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        if (selectedMarker != null) {
+            selectedMarker?.remove()
+        }
+        viewModel.getAllReport()
+    }
+
     private fun initPlaceAutoComplete() {
         if (!Places.isInitialized()) {
             Places.initialize(applicationContext, BuildConfig.MAPS_API_KEY)
@@ -78,32 +85,17 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
 
         val autocompleteFragment = supportFragmentManager.findFragmentById(R.id.autocomplete_fragment) as AutocompleteSupportFragment?
 
-        // Replace dari kode yg dibawah
-        autocompleteFragment?.apply {
-            setPlaceFields(listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG))
+        autocompleteFragment!!.setPlaceFields(listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG))
 
-            setHint(getString(R.string.search_view_hint))
+        autocompleteFragment.setHint(getString(R.string.search_view_hint))
 
-            setOnPlaceSelectedListener(object : PlaceSelectionListener {
-                override fun onPlaceSelected(place: Place) {
-                    place.latLng?.let { setCurrentSelectedLatLang(it) }
-                }
+        autocompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
+            override fun onPlaceSelected(place: Place) {
+                place.latLng?.let { setCurrentSelectedLatLang(it) }
+            }
 
-                override fun onError(status: Status) {}
-            })
-        }
-
-//        autocompleteFragment!!.setPlaceFields(listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG))
-//
-//        autocompleteFragment.setHint(getString(R.string.search_view_hint))
-//
-//        autocompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
-//            override fun onPlaceSelected(place: Place) {
-//                place.latLng?.let { setCurrentSelectedLatLang(it) }
-//            }
-//
-//            override fun onError(status: Status) {}
-//        })
+            override fun onError(status: Status) {}
+        })
     }
 
     private fun initMapFragment() {
@@ -250,14 +242,16 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
 
         with(report) {
             tvDisasterName.text = disaster.disasterName
-            tvDisasterAddress.text = String.format("${address.city}, ${address.state}")
+            tvDisasterAddress.text = String.format("${address.address}, ${address.city.replace("Kabupaten ", "").replace("Kota ", "")}")
             tvDisasterLatLng.text = String.format("${address.latitude.roundOffDecimal()}°, ${address.longitude.roundOffDecimal()}°")
             tvDisasterDesc.text = description
             tvDisasterTime.text = getDateTime(timeStamp)
             Glide.with(this@MainActivity)
-                    .load(photoUri)
-                    .placeholder(R.drawable.default_placeholder)
-                    .into(imgDisaster)
+                .load(photoUri[0])
+                .placeholder(R.drawable.default_placeholder)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
+                .into(imgDisaster)
 
             if(feedback.status) {
                 tvFeedback.text = feedback.description
@@ -269,23 +263,14 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
         bottomSheetBehavior.state = STATE_EXPANDED
     }
 
-    private fun Double.roundOffDecimal(): Double {
-        val df = DecimalFormat("#.####", DecimalFormatSymbols(Locale.ENGLISH))
-        df.roundingMode = RoundingMode.CEILING
-        return df.format(this).toDouble()
-    }
 
-    private fun getDateTime(timestamp: Timestamp): String {
-        val milliseconds = timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000
-        val sdf = SimpleDateFormat("dd MMMM yyyy, HH:mm", Locale.getDefault())
-        val netDate = Date(milliseconds)
-        return sdf.format(netDate).toString()
-    }
 
     private fun addNewReport(address: Address) {
         val intent = Intent(this, DisasterReportFormActivity::class.java)
         intent.putExtra(EXTRA_DATA_ADDRESS, address)
+
         startActivity(intent)
+        overridePendingTransition(R.anim.top_to_bottom, R.anim.null_animation)
     }
 
     private fun getAddressFromLocation(latLng: LatLng) {
@@ -298,14 +283,13 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
                         Toast.makeText(this@MainActivity, result[0].subLocality, Toast.LENGTH_SHORT).show()
                         with(result[0]) {
                             selectedAddress = Address(
-                                    subLocality ?: "Unknown",
-                                    subAdminArea ?: "Unknown",
-                                    adminArea ?: "Unknown",
-                                    countryName ?: "Unknown",
-                                    postalCode ?: "Unknown",
-                                    locality ?: "Unknown",
-                                    latitude,
-                                    longitude
+                                subLocality ?: "Unknown",
+                                locality ?: "Unknown",
+                                subAdminArea ?: "Unknown",
+                                adminArea ?: "Unknown",
+                                countryName ?: "Unknown",
+                                latitude,
+                                longitude
                             )
                             binding.btnAdd.show()
                         }

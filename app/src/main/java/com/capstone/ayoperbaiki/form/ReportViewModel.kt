@@ -1,7 +1,6 @@
 package com.capstone.ayoperbaiki.form
 
-import android.util.Log
-import androidx.core.net.toUri
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,39 +13,78 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
 @HiltViewModel
-class ReportViewModel @Inject constructor(
-    private val reportUseCase: ReportUseCase
-): ViewModel() {
-    private var _reportResult = MutableLiveData<Report>()
+class ReportViewModel @Inject constructor(private val reportUseCase: ReportUseCase): ViewModel() {
 
-    val reportResult: LiveData<Report> = _reportResult
+    private val _submitReportStatus = MutableLiveData<Resource<Boolean>>()
+    private val _uploadSingleImageStatus = MutableLiveData<Resource<Uri>>()
+    private val _uploadImagePercentage = MutableLiveData<Int>()
+    private val _listPhotoUrl = MutableLiveData<MutableList<String>>()
+    private val _listPhotoUri = MutableLiveData<MutableList<Uri>>()
+    private val _report = MutableLiveData<Report>()
 
-    fun setResultOfReportForm(report: Report){
-        _reportResult.postValue(report)
-    }
+    val submitReportStatus : LiveData<Resource<Boolean>> = _submitReportStatus
+    val uploadSingleImageStatus : LiveData<Resource<Uri>> = _uploadSingleImageStatus
+    val uploadImagePercentage : LiveData<Int> = _uploadImagePercentage
+    val listPhotoUrl : LiveData<MutableList<String>> = _listPhotoUrl
+    val listPhotoUri : LiveData<MutableList<Uri>> = _listPhotoUri
 
-    fun insertFormReport(): Resource<Boolean> {
-        val report = _reportResult.value
-        var status: Resource<Boolean> = Resource.Loading()
-        if(report != null){
-            viewModelScope.launch(Dispatchers.IO){
-                status = reportUseCase.submitReport(report)
-
+    fun submitReport() {
+        _submitReportStatus.value = Resource.Loading()
+        viewModelScope.launch {
+            _report.value.let {
+                val report = Report(
+                        disaster = it!!.disaster,
+                        timeStamp = it.timeStamp,
+                        address = it.address,
+                        typeOfDamage = it.typeOfDamage,
+                        description = it.description,
+                        feedback = it.feedback,
+                        photoUri = _listPhotoUrl.value!!.toList()
+                )
+                _submitReportStatus.postValue(reportUseCase.submitReport(report))
             }
         }
-        return status
     }
 
-    fun uploadImage(uri: List<String>){
-        uri.forEach {
-            Log.d("DisasterReportForm", "uploadImage: string 1 $it")
+    fun uploadImage() {
+        listPhotoUri.value?.forEach { uri ->
+            _uploadSingleImageStatus.value = Resource.Loading()
+            viewModelScope.launch(Dispatchers.IO) {
+                reportUseCase.uploadImageWithUri(uri) { resource, i ->
+                    _uploadImagePercentage.postValue(i)
+                    _uploadSingleImageStatus.postValue(resource)
 
-            reportUseCase.uploadImageWithUri(it.toUri())
-            { status, percent ->
-                Log.d("DisasterReportForm", "uploadImage: isi status $status status percent $percent")
+                    if (resource is Resource.Success)
+                        _listPhotoUrl.plusAssign(resource.data.toString())
+                }
             }
         }
+    }
+
+    fun addReport(report: Report) {
+        _report.value = report
+    }
+
+    fun addPhotoUri(uri: Uri) {
+        _listPhotoUri.plusAssign(uri)
+    }
+
+    fun removePhotoUri(position: Int) {
+        _listPhotoUri.minus(position)
+    }
+
+    operator fun <T> MutableLiveData<MutableList<T>>.plusAssign(item: T) {
+        val value = this.value ?: mutableListOf()
+        value.add(item)
+        this.value = value
+    }
+
+    operator fun <T> MutableLiveData<MutableList<T>>.minus(item: Int) {
+        val value = this.value ?: mutableListOf()
+        value.removeAt(item)
+        this.value = value
     }
 
 }
