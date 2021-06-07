@@ -1,23 +1,13 @@
 package com.capstone.ayoperbaiki.utils
 
-import android.Manifest
-import android.graphics.Bitmap
 import android.view.View
-import com.capstone.ayoperbaiki.core.domain.model.Disaster
-import com.capstone.ayoperbaiki.core.domain.model.Feedback
-import com.capstone.ayoperbaiki.core.domain.model.Report
-import com.capstone.ayoperbaiki.form.DisasterReportFormActivity
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.Timestamp
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.random.Random
 
 object Utils {
     const val EXTRA_DATA_ADDRESS = "extra_data_address"

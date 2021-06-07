@@ -2,7 +2,6 @@ package com.capstone.ayoperbaiki.utils
 
 import android.Manifest
 import android.content.Context
-import android.os.Build
 import pub.devrel.easypermissions.EasyPermissions
 
 object TrackingUtility {

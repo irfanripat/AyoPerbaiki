@@ -3,7 +3,6 @@ package com.capstone.ayoperbaiki.core.domain.usecase
 import android.net.Uri
 import com.capstone.ayoperbaiki.core.data.Resource
 import com.capstone.ayoperbaiki.core.domain.model.Report
-import kotlinx.coroutines.flow.Flow
 
 interface ReportUseCase {
 

@@ -4,8 +4,6 @@ package com.capstone.ayoperbaiki.utils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -13,7 +11,6 @@ import com.capstone.ayoperbaiki.R
 import com.capstone.ayoperbaiki.databinding.ItemAddPhotoBinding
 import com.capstone.ayoperbaiki.databinding.ItemPhotoBinding
 import com.capstone.ayoperbaiki.utils.Utils.LIMIT_PICTURE
-import com.capstone.ayoperbaiki.utils.Utils.hide
 
 class GridPhotoAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
