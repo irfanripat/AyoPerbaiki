@@ -205,13 +205,7 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
                                     )
                                 )
                                 .title(report.disaster.disasterName)
-                                .icon(
-                                    BitmapDescriptorFactory.fromResource(
-                                        mapDisasterIcon.getValue(
-                                            report.disaster.id
-                                        )
-                                    )
-                                )
+                                .icon( if (report.disaster.id == 7) BitmapDescriptorFactory.fromResource(R.drawable.ic_banjir) else BitmapDescriptorFactory.fromResource(mapDisasterIcon.getValue(report.disaster.id)))
                         )
                     }
                 }
