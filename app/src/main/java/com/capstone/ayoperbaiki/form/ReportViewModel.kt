@@ -18,37 +18,53 @@ import javax.inject.Inject
 class ReportViewModel @Inject constructor(private val reportUseCase: ReportUseCase): ViewModel() {
 
     private val _submitReportStatus = MutableLiveData<Resource<Boolean>>()
-    private val _uploadImageStatus = MutableLiveData<Resource<Uri>>()
+    private val _uploadSingleImageStatus = MutableLiveData<Resource<Uri>>()
     private val _uploadImagePercentage = MutableLiveData<Int>()
-    private val _listPhotoUrl = MutableLiveData<List<String>>()
+    private val _listPhotoUrl = MutableLiveData<MutableList<String>>()
     private val _listPhotoUri = MutableLiveData<MutableList<Uri>>()
+    private val _report = MutableLiveData<Report>()
 
     val submitReportStatus : LiveData<Resource<Boolean>> = _submitReportStatus
-    val uploadImageStatus : LiveData<Resource<Uri>> = _uploadImageStatus
+    val uploadSingleImageStatus : LiveData<Resource<Uri>> = _uploadSingleImageStatus
     val uploadImagePercentage : LiveData<Int> = _uploadImagePercentage
-    val listPhotoUrl : LiveData<List<String>> = _listPhotoUrl
+    val listPhotoUrl : LiveData<MutableList<String>> = _listPhotoUrl
     val listPhotoUri : LiveData<MutableList<Uri>> = _listPhotoUri
 
-    fun submitReport(report: Report)  {
+    fun submitReport() {
         _submitReportStatus.value = Resource.Loading()
         viewModelScope.launch {
-            _submitReportStatus.postValue(reportUseCase.submitReport(report))
+            _report.value.let {
+                val report = Report(
+                        disaster = it!!.disaster,
+                        timeStamp = it.timeStamp,
+                        address = it.address,
+                        typeOfDamage = it.typeOfDamage,
+                        description = it.description,
+                        feedback = it.feedback,
+                        photoUri = _listPhotoUrl.value!!.toList()
+                )
+                _submitReportStatus.postValue(reportUseCase.submitReport(report))
+            }
         }
     }
 
     fun uploadImage() {
         listPhotoUri.value?.forEach { uri ->
-            _uploadImageStatus.value = Resource.Loading()
+            _uploadSingleImageStatus.value = Resource.Loading()
             viewModelScope.launch(Dispatchers.IO) {
                 reportUseCase.uploadImageWithUri(uri) { resource, i ->
                     _uploadImagePercentage.postValue(i)
-                    _uploadImageStatus.postValue(resource)
+                    _uploadSingleImageStatus.postValue(resource)
 
                     if (resource is Resource.Success)
-                        _listPhotoUrl.value?.plus(resource.data)
+                        _listPhotoUrl.plusAssign(resource.data.toString())
                 }
             }
         }
+    }
+
+    fun addReport(report: Report) {
+        _report.value = report
     }
 
     fun addPhotoUri(uri: Uri) {

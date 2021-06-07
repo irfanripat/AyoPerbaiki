@@ -383,7 +383,6 @@ class DisasterReportFormActivity : AppCompatActivity(), EasyPermissions.Permissi
         }
     }
 
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when(requestCode){
@@ -412,7 +411,6 @@ class DisasterReportFormActivity : AppCompatActivity(), EasyPermissions.Permissi
             }
         }
     }
-
 
     private fun validateImage(bitmap: Bitmap?) : Boolean {
         val model = BlurImageModel.newInstance(this)
@@ -444,36 +442,24 @@ class DisasterReportFormActivity : AppCompatActivity(), EasyPermissions.Permissi
             selectedDisasterType = if (mapDisaster.getValue(7) == disasterType) customDisasterType else disasterType
             selectedDamageType = if (mapTypeOfDamage.getValue(13) == damageType) customDamageType else damageType
 
-            //iterate upload image to storage one by one
-            //save the return to a variable
-            //make report object
-
-            val report = Report(
+            viewModel.addReport(Report(
                     Disaster(getKey(mapDisaster, selectedDisasterType), selectedDisasterType),
                     disasterAddress,
                     disasterTime!!,
                     selectedDamageType,
                     disasterDescription,
                     Feedback(false, ""),
-                    viewModel.listPhotoUrl.value!!
-            )
-            viewModel.submitReport(report)
+                    listOf()
+            ))
+            viewModel.uploadImage()
         }
     }
 
     private fun observeUploadImageProgressStatus() {
-        viewModel.uploadImageStatus.observe(this@DisasterReportFormActivity, { status ->
-            if (status != null) {
-                when (status) {
-                    is Resource.Failure -> {
-                        //gagal mengupload image
-                    }
-                    is Resource.Loading -> {
-                        //
-                    }
-                    is Resource.Success -> {
-                        Toast.makeText(this, viewModel.listPhotoUrl.value.toString(), Toast.LENGTH_SHORT).show()
-                    }
+        viewModel.listPhotoUrl.observe(this@DisasterReportFormActivity, { list ->
+            if (list != null) {
+                if (list.size == viewModel.listPhotoUri.value?.size) {
+                    viewModel.submitReport()
                 }
             }
         })
