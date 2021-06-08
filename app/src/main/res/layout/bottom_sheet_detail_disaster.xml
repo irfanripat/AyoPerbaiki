@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/bottom_sheet_detail"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/rectange_top_corner"
@@ -50,7 +49,7 @@
                 android:layout_gravity="center"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
-                android:src="@drawable/ic_banjir_tr"
+                android:src="@drawable/ic_longsor_tr"
                 app:civ_border_color="@color/bg_gray"
                 app:civ_border_width="4dp"
                 app:civ_circle_color="@color/bg_gray"
@@ -197,20 +196,82 @@
                 android:layout_height="200dp"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
                 app:cardBackgroundColor="@color/bg_gray"
                 app:cardCornerRadius="10dp"
                 app:cardElevation="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/cv_damage_type"
                 app:layout_constraintTop_toBottomOf="@id/container_time_location">
 
-                <ImageView
-                    android:id="@+id/image_disaster"
+<!--                <ImageView-->
+<!--                    android:id="@+id/image_disaster"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:scaleType="centerCrop"-->
+<!--                    android:src="@drawable/sample_image"-->
+<!--                    tools:ignore="ContentDescription" />-->
+
+                <com.smarteist.autoimageslider.SliderView
+                    android:id="@+id/slider_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/sample_image"
-                    tools:ignore="ContentDescription" />
+                    app:sliderAnimationDuration="600"
+                    app:sliderAutoCycleDirection="back_and_forth"
+                    app:sliderAutoCycleEnabled="true"
+                    app:sliderIndicatorAnimationDuration="600"
+                    app:sliderIndicatorGravity="center_horizontal|bottom"
+                    app:sliderIndicatorMargin="15dp"
+                    app:sliderIndicatorOrientation="horizontal"
+                    app:sliderIndicatorPadding="3dp"
+                    app:sliderIndicatorRadius="2dp"
+                    app:sliderIndicatorSelectedColor="#5A5A5A"
+                    app:sliderIndicatorUnselectedColor="#FFF"
+                    app:sliderScrollTimeInSec="1"
+                    app:sliderStartAutoCycle="true" />
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cv_damage_type"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@color/bg_gray"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cv_disaster_doc">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:justificationMode="inter_word"
+                        android:paddingTop="8dp"
+                        android:paddingHorizontal="8dp"
+                        android:text="@string/jenis_kerusakan"
+                        android:textStyle="bold"
+                        tools:targetApi="o" />
+
+                    <TextView
+                        android:id="@+id/tv_damage_type"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:justificationMode="inter_word"
+                        android:padding="8dp"
+                        tools:text="Jenis kerusakan yang dialami"
+                        tools:targetApi="o" />
+
+                </LinearLayout>
 
             </androidx.cardview.widget.CardView>
 
@@ -219,24 +280,40 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 app:cardBackgroundColor="@color/bg_gray"
                 app:cardCornerRadius="10dp"
-                android:layout_marginBottom="16dp"
                 app:layout_constraintBottom_toTopOf="@id/cv_disaster_feedback"
                 app:cardElevation="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/cv_disaster_doc">
+                app:layout_constraintTop_toBottomOf="@+id/cv_damage_type">
 
-                <TextView
-                    android:id="@+id/tv_disaster_desc"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:justificationMode="inter_word"
-                    android:padding="8dp"
-                    android:text="@string/sample_text"
-                    tools:targetApi="o" />
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:justificationMode="inter_word"
+                        android:paddingTop="8dp"
+                        android:paddingHorizontal="8dp"
+                        android:text="@string/keterangan"
+                        android:textStyle="bold"
+                        tools:targetApi="o" />
+
+                    <TextView
+                        android:id="@+id/tv_disaster_desc"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:justificationMode="inter_word"
+                        android:padding="8dp"
+                        android:text="@string/sample_text"
+                        tools:targetApi="o" />
+
+                </LinearLayout>
 
             </androidx.cardview.widget.CardView>
 

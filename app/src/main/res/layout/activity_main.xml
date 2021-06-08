@@ -12,26 +12,46 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/autocomplete_fragment"
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:background="@color/white"
-        android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment" />
+        android:layout_margin="15dp"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="@android:color/transparent"
+        android:layout_height="50dp">
 
-    <SearchView
-        android:id="@+id/searchView"
-        android:padding="5dp"
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:iconifiedByDefault="false"
-        android:queryHint="Ketik lokasi, tempat..."
-        android:layout_margin="16dp"
-        android:layout_centerHorizontal="true"
-        android:background="@drawable/searchview_rounded"
-        android:queryBackground="@android:color/transparent" />
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/searchview_rounded"
+            tools:ignore="ContentDescription" />
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/autocomplete_fragment"
+            android:layout_width="match_parent"
+            android:layout_margin="1dp"
+            android:elevation="0dp"
+            android:layout_height="wrap_content"
+            android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment" />
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="36dp"
+            android:layout_gravity="center_vertical|end"
+            android:layout_marginEnd="8dp"
+            app:cardElevation="0dp"
+            app:cardCornerRadius="18dp"
+            android:layout_height="36dp">
+
+            <ImageButton
+                android:id="@+id/btn_info"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?selectableItemBackground"
+                android:src="@drawable/ic_info"
+                tools:ignore="ContentDescription" />
+
+        </androidx.cardview.widget.CardView>
+
+    </androidx.cardview.widget.CardView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btn_add"
@@ -63,7 +83,9 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/center">
 
-            <include layout="@layout/bottom_sheet_detail_disaster" />
+            <include
+                android:id="@+id/bottom_sheet_detail"
+                layout="@layout/bottom_sheet_detail_disaster" />
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
@@ -76,5 +98,13 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"/>
 
+    <include
+        android:visibility="gone"
+        android:id="@+id/cv_load_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginBottom="16dp"
+        layout="@layout/cv_load_address_data"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
