@@ -32,7 +32,8 @@
     <string name="permission_storage_request">Aplikasi membutuhkan izin akses penyimpanan eksternal untuk menyimpan gambar</string>
     <string name="permission_camera_request">Aplikasi membutuhkan kamera dan storage untuk mengambil gambar kerusakan bencana</string>
     <string name="blur_image_msg">Gambar kurang jelas. Mohon ambil gambar kembali!</string>
-    <string name="jenis_kerusakan">Jenis Kerusakan</string>
-    <string name="keterangan">Keterangan</string>
+    <string name="jenis_kerusakan">Jenis Kerusakan :</string>
+    <string name="keterangan">Keterangan :</string>
+    <string name="mencari_informasi_koordinat">Mencari informasi koordinat</string>
 
 </resources>

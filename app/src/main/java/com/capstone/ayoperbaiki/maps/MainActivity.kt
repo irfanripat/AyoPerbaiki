@@ -2,18 +2,15 @@ package com.capstone.ayoperbaiki.maps
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Color
 import android.location.Geocoder
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.capstone.ayoperbaiki.BuildConfig
 import com.capstone.ayoperbaiki.R
 import com.capstone.ayoperbaiki.core.data.Resource
@@ -23,6 +20,7 @@ import com.capstone.ayoperbaiki.databinding.ActivityMainBinding
 import com.capstone.ayoperbaiki.form.DisasterReportFormActivity
 import com.capstone.ayoperbaiki.utils.DisasterData.mapDisasterIcon
 import com.capstone.ayoperbaiki.utils.DisasterData.mapDisasterTypeIcon
+import com.capstone.ayoperbaiki.utils.SliderImageAdapter
 import com.capstone.ayoperbaiki.utils.Utils.EXTRA_DATA_ADDRESS
 import com.capstone.ayoperbaiki.utils.Utils.STARTING_COORDINATE
 import com.capstone.ayoperbaiki.utils.Utils.getDateTime
@@ -43,6 +41,8 @@ import com.google.android.libraries.places.widget.listener.PlaceSelectionListene
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
+import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType
+import com.smarteist.autoimageslider.SliderAnimations
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -126,7 +126,7 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
     }
 
     private fun initBottomSheet() {
-        bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet_detail))
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetDetail.root)
         bottomSheetBehavior.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
             @SuppressLint("SwitchIntDef")
@@ -230,41 +230,30 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
     }
 
     private fun displayDetailDisaster(report: Report) {
-        val tvDisasterName = findViewById<TextView>(R.id.tv_disaster_type)
-        val tvDamageType = findViewById<TextView>(R.id.tv_damage_type)
-        val tvDisasterAddress = findViewById<TextView>(R.id.tv_disaster_address)
-        val tvDisasterLatLng = findViewById<TextView>(R.id.tv_disaster_latlng)
-        val tvDisasterDesc = findViewById<TextView>(R.id.tv_disaster_desc)
-        val tvDisasterTime = findViewById<TextView>(R.id.tv_disaster_time)
-        val tvFeedback = findViewById<TextView>(R.id.tv_disaster_feedback)
-        val imgDisaster = findViewById<ImageView>(R.id.image_disaster)
-        val imgDisasterType = findViewById<ImageView>(R.id.image_disaster_type)
-
         with(report) {
-            tvDisasterName.text = disaster.disasterName
-            tvDamageType.text = typeOfDamage
-            tvDisasterAddress.text = String.format("${address.address}, ${address.city.replace("Kabupaten ", "").replace("Kota ", "")}")
-            tvDisasterLatLng.text = String.format("${address.latitude.roundOffDecimal().toStringLatitude()}, ${address.longitude.roundOffDecimal().toStringLongitude()}")
-            tvDisasterDesc.text = description
-            tvDisasterTime.text = getDateTime(timeStamp)
-            Glide.with(this@MainActivity)
-                .load(photoUri[0])
-                .placeholder(R.drawable.default_placeholder)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .skipMemoryCache(true)
-                .into(imgDisaster)
+            binding.bottomSheetDetail.apply {
+                this.tvDisasterType.text = disaster.disasterName
+                this.tvDamageType.text = typeOfDamage
+                this.tvDisasterAddress.text = String.format("${address.address}, ${address.city.replace("Kabupaten ", "").replace("Kota ", "")}")
+                this.tvDisasterLatlng.text = String.format("${address.latitude.roundOffDecimal().toStringLatitude()}, ${address.longitude.roundOffDecimal().toStringLongitude()}")
+                this.tvDisasterDesc.text = description
+                this.tvDisasterTime.text = getDateTime(timeStamp)
+                this.tvDisasterFeedback.text = if (feedback.status) feedback.description else getString(R.string.feedback_if_false)
+                val sliderImageAdapter = SliderImageAdapter()
+                sliderImageAdapter.setData(photoUri)
+                this.sliderView.setSliderAdapter(sliderImageAdapter)
+                sliderView.setIndicatorAnimation(IndicatorAnimationType.WORM)
+                sliderView.setSliderTransformAnimation(SliderAnimations.SIMPLETRANSFORMATION)
+                sliderView.indicatorSelectedColor = Color.WHITE
+                sliderView.indicatorUnselectedColor = Color.GRAY
+                sliderView.scrollTimeInSec = 4
+                sliderView.startAutoCycle()
 
-            Glide.with(this@MainActivity)
-                .load(mapDisasterTypeIcon[disaster.id])
-                .into(imgDisasterType)
-
-            if(feedback.status) {
-                tvFeedback.text = feedback.description
-            } else {
-                tvFeedback.text = getString(R.string.feedback_if_false)
+                Glide.with(this@MainActivity)
+                    .load(mapDisasterTypeIcon[disaster.id])
+                    .into(this.imageDisasterType)
             }
         }
-
         bottomSheetBehavior.state = STATE_EXPANDED
     }
 
@@ -279,12 +268,14 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
     }
 
     private fun getAddressFromLocation(latLng: LatLng) {
+        binding.cvLoadAddress.root.show()
         val geocode = Geocoder(this, Locale.getDefault())
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val result = geocode.getFromLocation(latLng.latitude, latLng.longitude, 1)
                 if (result.size > 0 && result[0] != null && result[0].subLocality != null) {
                     withContext(Dispatchers.Main) {
+                        binding.cvLoadAddress.root.hide()
                         Toast.makeText(this@MainActivity, result[0].subLocality, Toast.LENGTH_SHORT).show()
                         with(result[0]) {
                             selectedAddress = Address(
@@ -301,6 +292,7 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
                     }
                 } else {
                     withContext(Dispatchers.Main) {
+                        binding.cvLoadAddress.root.hide()
                         Toast.makeText(
                                 this@MainActivity,
                                 getString(R.string.no_return_address),
@@ -310,6 +302,7 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
                 }
             } catch (e: IOException) {
                 withContext(Dispatchers.Main) {
+                    binding.cvLoadAddress.root.hide()
                     Toast.makeText(this@MainActivity, getString(R.string.error_msg), Toast.LENGTH_SHORT).show()
                 }
             }
