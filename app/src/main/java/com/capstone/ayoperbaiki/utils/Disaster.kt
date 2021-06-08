@@ -53,7 +53,7 @@ object DisasterData {
         4 to R.drawable.ic_tsunami,
         5 to R.drawable.ic_longsor,
         6 to R.drawable.ic_gunung_berapi,
-        7 to R.drawable.ic_banjir
+        7 to R.drawable.ic_lainnya
     )
 
     val mapDisasterTypeIcon = mapOf(
@@ -63,7 +63,7 @@ object DisasterData {
         4 to R.drawable.ic_tsunami_tr,
         5 to R.drawable.ic_longsor_tr,
         6 to R.drawable.ic_gunung_merapi_tr,
-        7 to R.drawable.ic_banjir_tr
+        7 to R.drawable.ic_lainnya_tr
     )
 
 }
