@@ -49,6 +49,8 @@ import com.capstone.ayoperbaiki.utils.Utils.getKey
 import com.capstone.ayoperbaiki.utils.Utils.hide
 import com.capstone.ayoperbaiki.utils.Utils.roundOffDecimal
 import com.capstone.ayoperbaiki.utils.Utils.show
+import com.capstone.ayoperbaiki.utils.Utils.toStringLatitude
+import com.capstone.ayoperbaiki.utils.Utils.toStringLongitude
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Timestamp
 import com.jakewharton.rxbinding2.widget.RxTextView
@@ -280,8 +282,8 @@ class DisasterReportFormActivity : AppCompatActivity(), EasyPermissions.Permissi
             bindingForm.inputAlamat.setText(String.format("$address, $district"))
             bindingForm.inputKota.setText(city)
             bindingForm.inputProvinsi.setText(state)
-            bindingForm.inputLatitude.setText(String.format("${latitude.roundOffDecimal()}°"))
-            bindingForm.inputLongitude.setText(String.format("${longitude.roundOffDecimal()}°"))
+            bindingForm.inputLatitude.setText(String.format(latitude.roundOffDecimal().toStringLatitude()))
+            bindingForm.inputLongitude.setText(String.format(longitude.roundOffDecimal().toStringLongitude()))
         }
     }
 
