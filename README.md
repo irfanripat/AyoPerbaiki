@@ -1,3 +1,3 @@
 # AyoPerbaiki
-Aplikasi monitoring bencana alam dan kerusakan yang terjadi di Indonesia
+Aplikasi monitoring kerusakan akibat bencana alam yang terjadi di Indonesia
 
