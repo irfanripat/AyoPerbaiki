@@ -35,5 +35,16 @@
     <string name="jenis_kerusakan">Jenis Kerusakan :</string>
     <string name="keterangan">Keterangan :</string>
     <string name="mencari_informasi_koordinat">Mencari informasi koordinat</string>
+    <string name="bagaimana_membuat_laporan">Bagaimana membuat laporan ?</string>
+
+    <string name="list_how_to_make_a_report">
+        <li>1) Item 1</li>\n
+        <li>2) Item 2</li>\n
+        <li>3) Item 3</li>\n
+    </string>
+    <string name="point_1">Tandai lokasi tempat bencana terjadi. Anda dapat melakukannya dengan menekan lama pada maps atau menggunakan fitur pencarian.</string>
+    <string name="point_2">Setelah menandai koordinat, aplikasi terlebih dahulu akan mengambil informasi alamat dari koordinat yang anda tandai. Jika Berhasil, tombol \'Buat Laporan\' akan muncul pada pojok kanan bawah.</string>
+    <string name="point_3">Lengkapi form pengisian, pastikan anda mengisi data yang diperlukan menggunakan informasi yang benar. Sertakan juga bukti visual seperti gambar kerusakan bencana.</string>
+    <string name="point_4">Jika telah selesai, tekan tombol \'Buat Laporan\' dan tunggu hingga proses selesai. Anda akan langsung diarahkan kembali ke halaman maps dan mendapatkan pembaharuan data laporan.</string>
 
 </resources>

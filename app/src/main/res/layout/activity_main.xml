@@ -17,7 +17,7 @@
         android:layout_margin="15dp"
         app:cardElevation="0dp"
         app:cardBackgroundColor="@android:color/transparent"
-        android:layout_height="55dp">
+        android:layout_height="50dp">
 
         <ImageView
             android:layout_width="match_parent"
@@ -32,6 +32,24 @@
             android:elevation="0dp"
             android:layout_height="wrap_content"
             android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment" />
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="36dp"
+            android:layout_gravity="center_vertical|end"
+            android:layout_marginEnd="8dp"
+            app:cardElevation="0dp"
+            app:cardCornerRadius="18dp"
+            android:layout_height="36dp">
+
+            <ImageButton
+                android:id="@+id/btn_info"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?selectableItemBackground"
+                android:src="@drawable/ic_info"
+                tools:ignore="ContentDescription" />
+
+        </androidx.cardview.widget.CardView>
 
     </androidx.cardview.widget.CardView>
 

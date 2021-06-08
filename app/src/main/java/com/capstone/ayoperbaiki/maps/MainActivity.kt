@@ -18,6 +18,7 @@ import com.capstone.ayoperbaiki.core.domain.model.Address
 import com.capstone.ayoperbaiki.core.domain.model.Report
 import com.capstone.ayoperbaiki.databinding.ActivityMainBinding
 import com.capstone.ayoperbaiki.form.DisasterReportFormActivity
+import com.capstone.ayoperbaiki.utils.DialogInformation
 import com.capstone.ayoperbaiki.utils.DisasterData.mapDisasterIcon
 import com.capstone.ayoperbaiki.utils.DisasterData.mapDisasterTypeIcon
 import com.capstone.ayoperbaiki.utils.SliderImageAdapter
@@ -67,6 +68,7 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
         initMapFragment()
         initPlaceAutoComplete()
         initBottomSheet()
+        initDialogInformation()
         observeAllReport()
         observeSelectedLatLang()
         binding.btnAdd.setOnClickListener {
@@ -80,6 +82,12 @@ class MainActivity : AppCompatActivity(), GoogleMap.OnMapLongClickListener {
             selectedMarker?.remove()
         }
         viewModel.getAllReport()
+    }
+
+    private fun initDialogInformation() {
+        binding.btnInfo.setOnClickListener {
+            DialogInformation().show(supportFragmentManager, "Dialog Information")
+        }
     }
 
     private fun initPlaceAutoComplete() {
