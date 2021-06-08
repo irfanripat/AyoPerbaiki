@@ -10,7 +10,9 @@ import com.capstone.ayoperbaiki.core.domain.model.Report
 import com.capstone.ayoperbaiki.core.domain.usecase.ReportUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 
@@ -19,6 +21,7 @@ class ReportViewModel @Inject constructor(private val reportUseCase: ReportUseCa
 
     private val _submitReportStatus = MutableLiveData<Resource<Boolean>>()
     private val _uploadSingleImageStatus = MutableLiveData<Resource<Uri>>()
+//    private val _uploadSingleImageStatus = MutableLiveData<List<Any>>()
     private val _uploadImagePercentage = MutableLiveData<Int>()
     private val _listPhotoUrl = MutableLiveData<MutableList<String>>()
     private val _listPhotoUri = MutableLiveData<MutableList<Uri>>()
@@ -26,6 +29,7 @@ class ReportViewModel @Inject constructor(private val reportUseCase: ReportUseCa
 
     val submitReportStatus : LiveData<Resource<Boolean>> = _submitReportStatus
     val uploadSingleImageStatus : LiveData<Resource<Uri>> = _uploadSingleImageStatus
+//    val uploadSingleImageStatus : LiveData<List<Any>> = _uploadSingleImageStatus
     val uploadImagePercentage : LiveData<Int> = _uploadImagePercentage
     val listPhotoUrl : LiveData<MutableList<String>> = _listPhotoUrl
     val listPhotoUri : LiveData<MutableList<Uri>> = _listPhotoUri

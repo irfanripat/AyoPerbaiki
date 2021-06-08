@@ -30,7 +30,8 @@ class FirebaseDataSource @Inject constructor(
                     } catch (e: Exception) {
                         cont.resume(Resource.Failure(e))
                     }
-                }.addOnFailureListener {
+                }
+                .addOnFailureListener {
                     cont.resume(Resource.Failure(it))
                 }
         }

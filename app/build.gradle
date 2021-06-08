@@ -26,7 +26,7 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        resValue "string", "default_account_iccid", properties.getProperty("MAPS_API_KEY", "")
+        resValue "string", "default_account_iccid", properties.getProperty("MAPS_API_KEY", "AIzaSyAEXpgW8PcKtV15ziDOj0jqefx9glt5Olw")
     }
 
     buildTypes {
@@ -43,7 +43,7 @@ android {
         jvmTarget = '1.8'
     }
     buildFeatures {
-        viewBinding = true
+        viewBinding true
         mlModelBinding true
     }
 }

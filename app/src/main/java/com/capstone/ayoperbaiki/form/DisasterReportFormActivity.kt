@@ -3,6 +3,7 @@ package com.capstone.ayoperbaiki.form
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
+import android.app.ProgressDialog
 import android.app.TimePickerDialog
 import android.content.Intent
 import android.graphics.Bitmap
@@ -16,11 +17,14 @@ import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.capstone.ayoperbaiki.R
 import com.capstone.ayoperbaiki.core.data.Resource
@@ -45,10 +49,13 @@ import com.capstone.ayoperbaiki.utils.Utils.getKey
 import com.capstone.ayoperbaiki.utils.Utils.hide
 import com.capstone.ayoperbaiki.utils.Utils.roundOffDecimal
 import com.capstone.ayoperbaiki.utils.Utils.show
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Timestamp
 import com.jakewharton.rxbinding2.widget.RxTextView
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Observable
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.tensorflow.lite.support.image.TensorImage
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
@@ -78,7 +85,6 @@ class DisasterReportFormActivity : AppCompatActivity(), EasyPermissions.Permissi
         bindingForm = binding.detailContent
         setContentView(binding.root)
         address = intent.extras?.getParcelable<Address>(EXTRA_DATA_ADDRESS) as Address
-        initFormInputAdapter()
         showDataAddress()
         showRecyclerGrid()
         setUpViewBehavior()
@@ -87,6 +93,11 @@ class DisasterReportFormActivity : AppCompatActivity(), EasyPermissions.Permissi
         observeUploadImageProgressStatus()
         binding.btnBack.setOnClickListener(this)
         binding.btnSubmit.setOnClickListener(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        initFormInputAdapter()
     }
 
     private fun requestPermission() {
@@ -348,15 +359,15 @@ class DisasterReportFormActivity : AppCompatActivity(), EasyPermissions.Permissi
 
     @Throws(IOException::class)
     private fun createImageFile(): File {
-        // Create an image file name
-        val timeStamp: String = SimpleDateFormat(IMAGE_FILE_FORMAT, Locale.getDefault()).format(
-            System.currentTimeMillis()
-        )
+        val timeStamp: String = SimpleDateFormat(
+            IMAGE_FILE_FORMAT, Locale.getDefault()
+        ).format(System.currentTimeMillis())
         val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+
         return File.createTempFile(
-            "JPEG_${timeStamp}_", /* prefix */
-            ".jpg", /* suffix */
-            storageDir /* directory */
+            "JPEG_${timeStamp}_",
+            ".jpg",
+            storageDir
         ).apply {
             // Save a file: path for use with ACTION_VIEW intents
             outputImagePath = absolutePath
@@ -365,7 +376,9 @@ class DisasterReportFormActivity : AppCompatActivity(), EasyPermissions.Permissi
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
+        EasyPermissions.onRequestPermissionsResult(
+            requestCode, permissions, grantResults, this
+        )
     }
 
     override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {}
@@ -422,7 +435,7 @@ class DisasterReportFormActivity : AppCompatActivity(), EasyPermissions.Permissi
         }
     }
 
-    private fun submitReport() {
+    private fun submitReport(loading: ProgressDialog) {
         var selectedDisasterType: String
         var selectedDamageType: String
         with(bindingForm) {
@@ -449,6 +462,55 @@ class DisasterReportFormActivity : AppCompatActivity(), EasyPermissions.Permissi
             viewModel.uploadImage()
             //submit report automatically executed when upload image is completed
         }
+
+        viewModel.uploadImagePercentage.observe(this, { progress ->
+            Log.d("UPLOAD_PERCENTAGE", progress.toString())
+
+            if(loading.progress == 100) {
+                loading.dismiss()
+                lifecycleScope.launch{
+                    with(binding.popupSuccessUploaded.root){
+                        show()
+                        animate().alpha(1f).duration = 500L
+                        delay(2000)
+                        animate().alpha(0f).duration = 300L
+                        hide()
+                    }
+                }
+            }
+            else {
+                loading.progress = progress
+            }
+        })
+
+        viewModel.uploadSingleImageStatus.observe(this) { state ->
+            if(state != null) {
+                when(state){
+                    is Resource.Failure -> {
+                        Log.d(TAG, "FAILURE UPLOAD IMAGE: ${state.exception.message}")
+                        snackBarShow("Gagal mengunggah gambar").apply{
+                            show()
+                        }
+
+                        // show the failed notification to user
+                        binding.popupSuccessUploaded.iconState.setImageDrawable(
+                            AppCompatResources.getDrawable(this, R.drawable.failure)
+                        )
+                        binding.popupSuccessUploaded.tvState.text = resources.getString(R.string.failed_upload)
+                    }
+                    is Resource.Loading -> {
+
+                    }
+                    is Resource.Success -> {
+                        binding.popupSuccessUploaded.iconState.setImageDrawable(
+                            AppCompatResources.getDrawable(this, R.drawable.success)
+                        )
+                        binding.popupSuccessUploaded.tvState.text = resources.getString(R.string.success_uploaded)
+
+                    }
+                }
+            }
+        }
     }
 
     private fun observeUploadImageProgressStatus() {
@@ -459,11 +521,51 @@ class DisasterReportFormActivity : AppCompatActivity(), EasyPermissions.Permissi
                 }
             }
         })
+    }
 
-        viewModel.uploadImagePercentage.observe(this, {
-            Log.d("UPLOAD_PERCENTAGE", it.toString())
+    private fun observeSubmitReportProgressStatus() {
+        viewModel.submitReportStatus.observe(this, { status ->
+            if (status != null) {
+                when (status) {
+                    is Resource.Failure -> {
+                        Log.d(TAG, "FAILURE UPLOAD REPORT: ${status.exception.message}")
+
+                        // ask user to resubmit the data
+                        snackBarShow("Gagal melaporkan. Mohon ulangi").apply{
+                            setAction(R.string.message_ok) {  }
+                            show()
+                        }
+                    }
+                    is Resource.Loading -> {
+
+                    }
+                    is Resource.Success -> {
+                        lifecycleScope.launch {
+                            confirmBack()
+                        }
+                    }
+                }
+            }
         })
+    }
 
+    private fun snackBarShow(msg: String): Snackbar {
+        return Snackbar.make(
+            this,
+            binding.root,
+            msg,
+            Snackbar.LENGTH_LONG
+        )
+    }
+
+    private fun showUploadingDialog(): ProgressDialog {
+        return ProgressDialog(this).apply {
+            setTitle(resources.getString(R.string.uploading_images))
+            setMessage(resources.getString(R.string.upload_loading))
+            setProgressStyle(ProgressDialog.STYLE_HORIZONTAL)
+            max = 100
+            setCancelable(false)
+        }
     }
 
     private fun Bitmap.compress(cacheDir: File): File {
@@ -477,36 +579,60 @@ class DisasterReportFormActivity : AppCompatActivity(), EasyPermissions.Permissi
         return compressedFile
     }
 
-    private fun observeSubmitReportProgressStatus() {
-        viewModel.submitReportStatus.observe(this, { status ->
-            if (status != null) {
-                when (status) {
-                    is Resource.Failure -> {
-                        // show the failed notification to user
-                        // ask user to resubmit the data
-                    }
-                    is Resource.Loading -> {
-                        // show the loading bar
-                    }
-                    is Resource.Success -> {
-                        finish()
-                        overridePendingTransition(R.anim.null_animation, R.anim.bottom_to_top)
-                        // show the success notification to user
-                        // back to maps activity
-                    }
-                }
-            }
-        })
-    }
 
     override fun onClick(view: View?) {
         when(view) {
-            binding.btnBack -> confirmBack()
-            binding.btnSubmit -> submitReport()
+            binding.btnBack -> {
+                showAlertToGoBackOrSubmit(ALERT_CANCEL_REPORT)
+            }
+            binding.btnSubmit -> {
+                showAlertToGoBackOrSubmit(ALERT_SUBMIT_REPORT)
+            }
         }
     }
 
-    private fun confirmBack() {
+    private fun showAlertToGoBackOrSubmit(type: Int) {
+        val isDialogCancel = type == ALERT_CANCEL_REPORT
+        val dialogTitle: String
+        val dialogMessage: String
+        if (isDialogCancel) {
+            dialogTitle = getString(R.string.title_cancel)
+            dialogMessage = getString(R.string.message_cancel)
+        } else {
+            dialogTitle = getString(R.string.title_submit)
+            dialogMessage = getString(R.string.message_submit)
+        }
+
+        val alertDialogBuilder = AlertDialog.Builder(this)
+        with(alertDialogBuilder) {
+            setTitle(dialogTitle)
+            setMessage(dialogMessage)
+            setCancelable(false)
+            setPositiveButton(getString(R.string.yes)) { _, _ ->
+                if (isDialogCancel) {
+                    lifecycleScope.launch {
+                        confirmBack()
+                    }
+                } else {
+                    val loading = showUploadingDialog()
+                    loading.max = 100
+                    loading.show()
+
+                    submitReport(loading)
+                }
+            }
+            setNegativeButton(getString(R.string.no)) { dialog, _ -> dialog.cancel() }
+        }
+        val alertDialog = alertDialogBuilder.create()
+        alertDialog.show()
+    }
+
+    override fun onBackPressed() {
+        showAlertToGoBackOrSubmit(ALERT_CANCEL_REPORT)
+    }
+
+    private suspend fun confirmBack() {
+        delay(3000)
         finish()
         overridePendingTransition(R.anim.null_animation, R.anim.bottom_to_top)
     }
@@ -532,5 +658,8 @@ class DisasterReportFormActivity : AppCompatActivity(), EasyPermissions.Permissi
     companion object{
         private val TAG = DisasterReportFormActivity::class.java.simpleName
         private const val CAPTURE_IMAGE_FROM_CAMERA_REQUEST_CODE = 100
+        private const val ALERT_SUBMIT_REPORT = 10
+        private const val ALERT_CANCEL_REPORT = 20
+
     }
 }
