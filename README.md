@@ -2,11 +2,7 @@
 Aplikasi tracking serta pelaporan dampak kerusakan akibat bencana yang terjadi di wilayah Indonesia
 <br/><br/><br/><br/>
 
-<p float="left" align="middle">
-  <img src="/screenshot/splashscreen.png" width="220" />
-  <img src="/screenshot/maps.png" width="220" /> 
-  <img src="/screenshot/form.png" width="220" />
-</p>
+![Alt text](/screenshot/cover.png?raw=true "Cover")
 
 <br/><br/>
 ## Fitur Aplikasi
@@ -17,6 +13,18 @@ Aplikasi tracking serta pelaporan dampak kerusakan akibat bencana yang terjadi d
 
 <br/><br/>
 ## Library yang digunakan
-- [I'm an inline-style link](https://www.google.com)
-- [I'm an inline-style link](https://www.google.com)
-- [I'm an inline-style link](https://www.google.com)
+- [Dagger-Hilt](https://dagger.dev/hilt/)
+- [Glide](https://github.com/bumptech/glide)
+- [Auto Images Slider](https://github.com/smarteist/Android-Image-Slider)
+- [Kotlin Coroutines](https://github.com/Kotlin/kotlinx.coroutines)
+- [RxJava](https://github.com/ReactiveX/RxJava)
+- [RxBinding](https://github.com/JakeWharton/RxBinding)
+- [EasyPermission](https://github.com/googlesamples/easypermissions)
+- [TensorFlow Lite](https://www.tensorflow.org/lite/guide/android)
+- Firebase Firestore
+- Firebase Storage
+- Maps SDK
+- PlaceAutoComplemte API
+
+
+
