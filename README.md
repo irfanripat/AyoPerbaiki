@@ -29,7 +29,7 @@ Aplikasi tracking serta pelaporan dampak kerusakan akibat bencana yang terjadi d
 <br/><br/>
 ## Link Aplikasi
 Anda dapat mendownload aplikasi ini pada tautan berikut :
-- [AyoPerbaiki-1.0.0](https://drive.google.com/file/d/17_FiJzP0-QUaUcRWU07pgAqUQtOTMiC-/view?usp=drivesdk)
+- [AyoPerbaiki-1.0.0](https://drive.google.com/file/d/1-hKhpbwIJZma42dylRxwi4jKMN7ovvTb/view?usp=sharing)
 
 
 
